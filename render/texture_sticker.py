@@ -9,42 +9,47 @@ class TextureSticker(nn.Module):
         super().__init__()
         self.device = torch.device(args["device"])
         self.sticker = None
+        self.patch = None
+        self.is_attack = global_args["attack"]
         self.sticker_type = args["type"]
-        if "hls" == self.sticker_type:
-            self.sticker = self.generate_uniform__11_sticker(size=args["size"],
-                                                             require_grad=global_args["attack"],
-                                                             device=self.device)
         self.position = args["position"]
         self.intensity = args["intensity"]
+        self.texture_shape = args["texture"]
         self.visualization = {}
+
+        if "hls" == self.sticker_type:
+            self.generate_uniform__11_sticker(size=args["size"],  device=self.device)
 
     def forward(self, mesh):
         if "hls" == self.sticker_type:
             return self.apply_hls_sticker(mesh=mesh,
-                                          position=self.position,
                                           intensity=self.intensity)
         return mesh
 
-    def update_sticker(self):
-        # TODO
-        pass
-
-    def apply_hls_sticker(self, mesh, position, intensity=0.5):
+    def apply_hls_sticker(self, mesh, intensity=0.5):
         assert self.sticker is not None
-        texture = mesh.textures
-        # [B, H, W, C]
-        texture_tensor = getattr(texture, "_maps_padded")
-        # [B, C, H, W]
-        texture_tensor = texture_tensor.permute(0, 3, 1, 2)
-        # RGB -> HLS
-        hls = RgbToHls()
-        texture_tensor_hls = hls(texture_tensor)
-        # Add Patch
-        patch = torch.zeros_like(texture_tensor, device=self.device)
-        x_l, y_l = position
-        patch[:, 1, y_l: y_l + self.sticker.shape[1], x_l: x_l + self.sticker.shape[2]] = self.sticker
-        texture_tensor_hls_patch = texture_tensor_hls + intensity * patch
-        texture_tensor_hls_patch[0, 1, ...] = torch.clamp(texture_tensor_hls_patch[0, 1, ...], min=0, max=1)
+        with torch.no_grad():
+            texture = mesh.textures
+            # [B, H, W, C]
+            texture_tensor = getattr(texture, "_maps_padded")
+            # texture_tensor.requires_grad_(False)
+            # [B, C, H, W]
+            texture_tensor = texture_tensor.permute(0, 3, 1, 2)
+            # texture_tensor.requires_grad_(False)
+            # RGB -> HLS
+            hls = RgbToHls()
+            texture_tensor_hls = hls(texture_tensor)
+
+        self.patch.requires_grad_(True)
+        texture_tensor_hls_patch = texture_tensor_hls + intensity * self.patch
+
+        texture_tensor_hls_patch = texture_tensor_hls_patch.squeeze()
+        h: torch.Tensor = torch.select(texture_tensor_hls_patch, -3, 0)
+        l: torch.Tensor = torch.select(texture_tensor_hls_patch, -3, 1)
+        s: torch.Tensor = torch.select(texture_tensor_hls_patch, -3, 2)
+        l_ = torch.clamp(l, min=0, max=1)
+        texture_tensor_hls_patch = torch.stack([h, l_, s], dim=-3).unsqueeze(0)
+
         # HLS -> RGB
         rgb = HlsToRgb()
         texture_tensor_rgb_patch = rgb(texture_tensor_hls_patch)
@@ -53,23 +58,28 @@ class TextureSticker(nn.Module):
         setattr(texture, "_maps_padded", texture_tensor_rgb_patch)
 
         # ======================================= Visualization =======================================
-        if texture_tensor_rgb_patch.requires_grad:
-            vis_texture = texture_tensor_rgb_patch.detach().clone().cpu()
-        else:
-            vis_texture = texture_tensor_rgb_patch.clone().cpu()
-        # 0~1.0 RGB HWC
-        self.visualization["texture"] = vis_texture.squeeze().numpy()
+        with torch.no_grad():
+            if texture_tensor_rgb_patch.requires_grad:
+                vis_texture = texture_tensor_rgb_patch.detach().clone().cpu()
+            else:
+                vis_texture = texture_tensor_rgb_patch.clone().cpu()
+            # 0~1.0 RGB HWC
+            self.visualization["texture"] = vis_texture.squeeze().numpy()
         # =============================================================================================
         return mesh
 
-    @staticmethod
-    def generate_uniform__11_sticker(size, require_grad=False, device=torch.device("cpu")):
+    def generate_uniform__11_sticker(self, size, device=torch.device("cpu")):
         if isinstance(size, tuple) or isinstance(size, list):
-            res: torch.Tensor = (torch.rand((1, size[0], size[1]), device=device) - 0.5) * 2.0
+            self.sticker: torch.Tensor = (torch.rand((1, size[0], size[1]), device=device) - 0.5) * 2.0
         else:
-            res: torch.Tensor = (torch.rand((1, size, size), device=device) - 0.5) * 2.0
-        res.requires_grad_(require_grad)
-        return res
+            self.sticker: torch.Tensor = (torch.rand((1, size, size), device=device) - 0.5) * 2.0
+        # Add Patch
+        x_l, y_l = self.position
+        patch = torch.zeros(self.texture_shape, device=device)
+        patch[:, 1, y_l: y_l + self.sticker.shape[1], x_l: x_l + self.sticker.shape[2]] = self.sticker
+        self.patch = patch
+        if self.is_attack:
+            self.patch.requires_grad_(True)
 
     @staticmethod
     def generate_uniform_01_sticker(size, device=torch.device("cpu")):

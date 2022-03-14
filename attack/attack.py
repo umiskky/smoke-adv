@@ -1,5 +1,7 @@
+import torch
 import torch.nn as nn
 
+from attack.loss import Loss
 from render.object_loader import ObjectLoader
 from render.renderer import Renderer
 from render.scenario import Scenario
@@ -10,6 +12,7 @@ from tools.visualization.visualization import Visualization
 
 
 class Attack(nn.Module):
+
     def __init__(self, args: Config):
         super().__init__()
 
@@ -61,8 +64,10 @@ class Attack(nn.Module):
         # TODO
         if args.cfg_attack["switch_on"]:
             self.attack = None
+            self.loss = Loss(args.cfg_attack)
         else:
             self.attack = None
+            self.loss = None
         # =====================================================
 
         # =============== load visualization ==================
@@ -71,11 +76,11 @@ class Attack(nn.Module):
 
     def forward(self):
         # Init
-        mesh = texture = synthesis_img = box3d_branch = feat_branch = None
+        mesh = texture = synthesis_img = box3d_branch = feat_branch = loss = None
         K, scenario, scenario_size = self.scenario.forward()
         # Render Pipeline
         if self.object_loader is not None:
-            mesh, texture = self.object_loader.forward()
+            mesh = self.object_loader.forward()
             if self.stickers is not None:
                 mesh = self.stickers.forward(mesh)
             if self.renderer is not None:
@@ -86,15 +91,18 @@ class Attack(nn.Module):
                 box3d_branch, feat_branch = self.smoke.forward(synthesis_img)
             else:
                 box3d_branch, feat_branch = self.smoke.forward(scenario)
+            if self.loss is not None:
+                loss = self.loss.forward(box3d_branch)
 
         # Visualization Pipeline
-        self.visualization.vis(scenario=self.scenario,
-                               renderer=self.renderer,
-                               stickers=self.stickers,
-                               smoke=self.smoke)
+        with torch.no_grad():
+            self.visualization.vis(scenario=self.scenario,
+                                   renderer=self.renderer,
+                                   stickers=self.stickers,
+                                   smoke=self.smoke)
 
         # Result Setting
-        result_list = [box3d_branch, synthesis_img, scenario]
+        result_list = [loss, box3d_branch, synthesis_img, scenario]
         for result in result_list:
             if result is not None:
                 return result

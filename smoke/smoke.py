@@ -1,5 +1,8 @@
 import os.path as osp
 
+import copy
+import sys
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -22,10 +25,12 @@ class Smoke(nn.Module):
         assert torch.device("cuda:0") == self.device
         # init
         model_path = osp.join(global_args["project_path"], args["model_path"])
-        if osp.exists(model_path):
-            self.model = torch.jit.load(model_path, map_location=self.device)
-        else:
-            self.model = None
+        self.model_path = model_path
+        self.model = None
+        # if osp.exists(model_path):
+        #     self._model = torch.jit.load(model_path, map_location=self.device)
+        # else:
+        #     self._model = None
         # input params
         self.K = self.getIntrinsicMatrix(K=args["K"],
                                          is_inverse=False,
@@ -43,6 +48,8 @@ class Smoke(nn.Module):
     def forward(self, scenario, is_training=False) -> (torch.Tensor, torch.Tensor):
         # preprocessing ... transform
         scenario_input = self.smoke_transform(scenario)
+        # reload smoke model for each epoch
+        self.model = torch.jit.load(self.model_path, map_location=self.device)
 
         if self.model is not None:
             if not is_training:
@@ -50,22 +57,23 @@ class Smoke(nn.Module):
             self.box3d_branch, self.feat_branch = self.model.forward(scenario_input, (self.K_Inverse, self.ratio))
 
         # ======================================= Visualization =======================================
-        if self.box3d_branch.requires_grad:
-            vis_box3d_branch = self.box3d_branch.detach().clone().cpu()
-        else:
-            vis_box3d_branch = self.box3d_branch.clone().cpu()
-        obstacle_list = Obstacle.decode(box3d_branch_data=vis_box3d_branch,
-                                        k=self.K,
-                                        confidence_score=self.confidence_threshold,
-                                        ori_img_size=self.scenario_size)
-        self.visualization["detection"] = obstacle_list
+        with torch.no_grad():
+            if self.box3d_branch.requires_grad:
+                vis_box3d_branch = self.box3d_branch.detach().clone().cpu()
+            else:
+                vis_box3d_branch = self.box3d_branch.clone().cpu()
+            obstacle_list = Obstacle.decode(box3d_branch_data=vis_box3d_branch,
+                                            k=self.K,
+                                            confidence_score=self.confidence_threshold,
+                                            ori_img_size=self.scenario_size)
+            self.visualization["detection"] = obstacle_list
         # =============================================================================================
         return self.box3d_branch, self.feat_branch
 
     def smoke_transform(self, scenario) -> torch.Tensor:
         scenario_input = None
         if isinstance(scenario, np.ndarray):
-            scenario_input = torch.Tensor(scenario, device=self.device).float()
+            scenario_input = torch.tensor(scenario, device=self.device).float()
         elif isinstance(scenario, torch.Tensor):
             scenario_input = scenario
         assert scenario_input is not None
@@ -75,10 +83,10 @@ class Smoke(nn.Module):
             transforms.Resize(size=tuple(self.input_size)),
             transforms.Normalize(mean=tuple(self.transform_params["mean"]), std=tuple(self.transform_params["std"]))
         ])
-        scenario_input = transform(scenario_input)
+        scenario_input_ = transform(scenario_input)
         # BCHW
-        scenario_input = scenario_input.unsqueeze(0).float()
-        return scenario_input
+        scenario_input_ = scenario_input_.unsqueeze(0).float()
+        return scenario_input_
 
     @staticmethod
     def getIntrinsicMatrix(K: np.ndarray, is_inverse=True, device=torch.device("cpu")):

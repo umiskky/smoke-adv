@@ -117,22 +117,19 @@ class Renderer(nn.Module):
         # H W C
         mesh_in_back = mesh_in_back[0, :].permute(1, 2, 0)
         synthesis_img = self.merge_render_target(mesh_in_back, target)
-        # if vis:
-        #     vis_img(mesh_in_back, (mesh_in_back.shape[1] / 100, mesh_in_back.shape[0] / 100))
-        # if save:
-        #     save_img(mesh_in_back, save_path, is_normalized=True)
 
         # ======================================= Visualization =======================================
-        if mesh_in_back.requires_grad:
-            vis_mesh_in_back = mesh_in_back.detach().clone().cpu().numpy()
-        else:
-            vis_mesh_in_back = mesh_in_back.clone().cpu().numpy()
-        if synthesis_img.requires_grad:
-            vis_synthesis_img = synthesis_img.detach().clone().cpu().numpy()
-        else:
-            vis_synthesis_img = synthesis_img.clone().cpu().numpy()
-        self.visualization["render_bg"] = vis_mesh_in_back
-        self.visualization["render_scenario"] = vis_synthesis_img
+        with torch.no_grad():
+            if mesh_in_back.requires_grad:
+                vis_mesh_in_back = mesh_in_back.detach().clone().cpu().numpy()
+            else:
+                vis_mesh_in_back = mesh_in_back.clone().cpu().numpy()
+            if synthesis_img.requires_grad:
+                vis_synthesis_img = synthesis_img.detach().clone().cpu().numpy()
+            else:
+                vis_synthesis_img = synthesis_img.clone().cpu().numpy()
+            self.visualization["render_bg"] = vis_mesh_in_back
+            self.visualization["render_scenario"] = vis_synthesis_img
         # =============================================================================================
 
         return synthesis_img

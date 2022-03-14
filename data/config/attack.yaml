@@ -1,7 +1,7 @@
 global:
   device: "cuda:0"
   project_path: "/home/dingxl/workspace/smoke-adv/"
-  attack: false
+  attack: true
 
 object:
   switch_on: true
@@ -16,7 +16,8 @@ stickers:
   type: "hls"
   size: [1200, 1200]
   position: [4600, 5600]
-  intensity: 0.8
+  intensity: 1.0
+  texture: [1, 3, 8192, 8192]
 
 scenario:
   waymo_index: "0002045"
@@ -57,9 +58,16 @@ smoke:
     shape_feat: [1, 64, 160, 240]
 
 attack:
-  switch_on: false
+  switch_on: true
+  target: "WALKER"
+  loss:
+    type: "class_threshold"
+    threshold: 0.25
   optimizer:
-    iters: 10
+    alpha: 0.005
+    clip_min: 0.0
+    clip_max: 1.0
+
 
 visualization:
   save: true
@@ -71,3 +79,5 @@ visualization:
   render_scenario: true
   detection_3d: true
   detection_2d: true
+
+

@@ -14,6 +14,7 @@ class Visualization:
         self.args = args
         self.global_args = global_args
         self.timestamp = get_utc8_time()
+        self.experiment_path = osp.join(global_args["project_path"], "data/results", self.timestamp)
         self.save_dir = osp.join(global_args["project_path"], "data/results", self.timestamp, "visualization")
         self.save = args["save"]
         if self.save:
@@ -49,7 +50,7 @@ class Visualization:
             if self.args["plot"]:
                 plot_img(texture_plot, "texture")
             if self.args["save"]:
-                saving_path = osp.join(self.save_dir, "sticker", str(self.counter)+"_step_texture.png")
+                saving_path = osp.join(self.save_dir, "sticker", "%05d" % self.counter + "_step_texture.png")
                 save_img(texture_plot, saving_path)
 
         if renderer is not None and self.args["render_bg"] and not len(renderer.visualization) == 0:
@@ -58,7 +59,7 @@ class Visualization:
             if self.args["plot"]:
                 plot_img(render_bg_plot, "render in background")
             if self.args["save"]:
-                saving_path = osp.join(self.save_dir, "render_bg", str(self.counter) + "_step_render_bg.png")
+                saving_path = osp.join(self.save_dir, "render_bg", "%05d" % self.counter+ "_step_render_bg.png")
                 save_img(render_bg_plot, saving_path)
 
         if renderer is not None and self.args["render_scenario"] and not len(renderer.visualization) == 0:
@@ -68,7 +69,7 @@ class Visualization:
                 plot_img(render_scenario_plot, "render in scenario")
             if self.args["save"]:
                 saving_path = osp.join(self.save_dir, "render_scenario",
-                                       str(self.counter) + "_step_render_scenario.png")
+                                       "%05d" % self.counter + "_step_render_scenario.png")
                 save_img(render_scenario_plot, saving_path)
 
         obstacle_list = smoke.visualization["detection"] if smoke is not None else None
@@ -83,7 +84,7 @@ class Visualization:
             if self.args["plot"]:
                 plot_img(detection_3d_plot, "detection 3d")
             if self.args["save"]:
-                saving_path = osp.join(self.save_dir, "detection_3d", str(self.counter) + "_step_detection_3d.png")
+                saving_path = osp.join(self.save_dir, "detection_3d", "%05d" % self.counter + "_step_detection_3d.png")
                 save_img(detection_3d_plot, saving_path)
 
         if smoke is not None and self.args["detection_2d"] and not len(smoke.visualization) == 0:
@@ -93,7 +94,7 @@ class Visualization:
             if self.args["plot"]:
                 plot_img(detection_2d_plot, "detection 2d")
             if self.args["save"]:
-                saving_path = osp.join(self.save_dir, "detection_2d", str(self.counter) + "_step_detection_2d.png")
+                saving_path = osp.join(self.save_dir, "detection_2d", "%05d" % self.counter + "_step_detection_2d.png")
                 save_img(detection_2d_plot, saving_path)
 
         if self.args["save"]:

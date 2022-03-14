@@ -20,7 +20,7 @@ class ObjectLoader(nn.Module):
         self.load()
 
     def forward(self):
-        return self.mesh, getattr(self.mesh, "_verts_list")[0]
+        return self.mesh
 
     def load(self):
         assert self.model_matrix is not None

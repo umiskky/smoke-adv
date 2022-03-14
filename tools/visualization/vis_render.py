@@ -25,9 +25,9 @@ def save_img(image: np.ndarray, path: str, is_BGR=False):
         image = image * 255.0
         image = image.astype(np.uint8)
     if is_BGR:
-        cv2.imwrite(path, image, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+        cv2.imwrite(path, image, [cv2.IMWRITE_PNG_COMPRESSION, 4])
     else:
-        cv2.imwrite(path, image[:, :, ::-1], [cv2.IMWRITE_PNG_COMPRESSION, 0])
+        cv2.imwrite(path, image[:, :, ::-1], [cv2.IMWRITE_PNG_COMPRESSION, 4])
 
 
 @DeprecationWarning
