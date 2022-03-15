@@ -44,7 +44,7 @@ if __name__ == "__main__":
     y_l = 5600
 
     ts = TextureSticker(device)
-    ts.sticker = TextureSticker.generate_uniform__11_sticker(size=1200, require_grad=True, device=device)
+    ts.sticker = TextureSticker.generate_uniform_tensor(size=1200, require_grad=True, device=device)
     print(ts.sticker)
 
     ts.apply_hls_sticker(mesh, (x_l, y_l), intensity=0.8)

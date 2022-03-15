@@ -14,10 +14,13 @@ object:
 stickers:
   switch_on: true
   type: "hls"
-  size: [1200, 1200]
-  position: [4600, 5600]
+  size: [8192, 8192]
+  position: [0, 0]
   intensity: 1.0
   texture: [1, 3, 8192, 8192]
+  mask:
+    half_sleeve: "data/objects/man/mask_half_sleeve.jpg"
+#    jeans: "data/objects/man/mask_jeans.jpg"
 
 scenario:
   waymo_index: "0002045"
@@ -35,7 +38,7 @@ renderer:
     specular_color: [0.0, 0.0, 0.0]
     location: [10, 8, -6]
   render:
-    quality_rate: 1
+    quality_rate: 3
     background_color: [0.0, 0.0, 0.0]
 
 defense:
@@ -45,7 +48,7 @@ smoke:
   device: "cuda:0"
   switch_on: true
   model_path: "data/model/smoke_libtorch_model.pth"
-  confidence_threshold: 0.25
+  confidence_threshold: 0.15
   transform:
     mean: [0.0, 0.0, 0.0]
     std: [58.395, 57.12, 57.375]
@@ -62,11 +65,11 @@ attack:
   target: "WALKER"
   loss:
     type: "class_threshold"
-    threshold: 0.25
+    threshold: 0.15
   optimizer:
-    alpha: 0.005
+    alpha: 0.002
     clip_min: 0.0
-    clip_max: 1.0
+    clip_max: 0.3
 
 
 visualization:

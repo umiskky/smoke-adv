@@ -35,7 +35,7 @@ def main(args):
                            clip_max=cfg.cfg_attack["optimizer"]["clip_max"],
                            position=cfg.cfg_stickers["position"],
                            size=cfg.cfg_stickers["size"])
-        es = EarlyStop()
+        es = EarlyStop(max_step=12)
         flag = True
         epoch = 0
         while flag:

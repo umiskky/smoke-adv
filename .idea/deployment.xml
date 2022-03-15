@@ -15,7 +15,6 @@
             <mapping deploy="/home/dingxl/workspace/smoke-adv" local="$PROJECT_DIR$" />
           </mappings>
           <excludedPaths>
-            <excludedPath path="/home/dingxl/workspace/smoke-adv/data/results" />
             <excludedPath path="/home/dingxl/workspace/smoke-adv/data/datasets" />
           </excludedPaths>
         </serverdata>
