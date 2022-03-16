@@ -54,13 +54,13 @@ class Obstacle:
             if total_pred.shape[0] > 0:
                 # alpha_z
                 pred_alpha = total_pred[:, 1]
-                # TODO [h, l, w] -> [w, h, l]
+                # [h, l, w] -> [w, h, l]
                 pred_dimensions = total_pred[:, 6:9].roll(shifts=1, dims=1)
                 # [x, y, z]
                 pred_locations = total_pred[:, 9:12]
                 # pred_alpha -> pred_rotation_y
                 pred_rotation_y = affine_utils.alpha2rotation_y_N(pred_alpha, pred_locations[:, 0], pred_locations[:, 2])
-
+                # shape=[10, 2, 8]
                 box3d_image = affine_utils.recovery_3d_box(pred_rotation_y, pred_dimensions, pred_locations, k, ori_img_size)
 
                 for idx in range(total_pred.shape[0]):

@@ -14,6 +14,9 @@ class Renderer(nn.Module):
         self.light = None
         self.renderer = None
 
+        # Pseudo 2D Box GT
+        self.box_pseudo_gt = {}
+
         self.background_color = tuple(args["render"]["background_color"])
         self.scenario_size = args["scenario_size"]
 
@@ -35,7 +38,7 @@ class Renderer(nn.Module):
         synthesis_normalized_img = self.render(mesh, scenario_tensor)
         # 0~255.0
         synthesis_img = synthesis_normalized_img * 255.0
-        return synthesis_img
+        return synthesis_img, self.box_pseudo_gt
 
     def set_camera(self, height, K, img_size):
         """
@@ -116,6 +119,22 @@ class Renderer(nn.Module):
                                              (self.scenario_size[0], self.scenario_size[1]))
         # H W C
         mesh_in_back = mesh_in_back[0, :].permute(1, 2, 0)
+
+        # Calculate Pseudo 2D Box GT
+        with torch.no_grad():
+            if mesh_in_back.requires_grad:
+                mesh_in_back_copy = mesh_in_back.detach().clone().cpu()
+            else:
+                mesh_in_back_copy = mesh_in_back.clone().cpu()
+            # merge rgb value
+            mesh_in_back_copy_sum_c = mesh_in_back_copy.sum(dim=2)
+            index = torch.nonzero(mesh_in_back_copy_sum_c - np.array(self.background_color).sum())
+            y_min = index[0][0]
+            x_min = index[0][1]
+            y_max = index[-1][0]
+            x_max = index[-1][1]
+            self.box_pseudo_gt["2d"] = [x_min, y_min, x_max, y_max]
+
         synthesis_img = self.merge_render_target(mesh_in_back, target)
 
         # ======================================= Visualization =======================================

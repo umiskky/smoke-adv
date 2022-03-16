@@ -25,7 +25,7 @@ def draw_3d_box(image, obstacle, color_map=None):
     """
     if color_map is None:
         color_map = {0: (255, 167, 38), 1: (38, 198, 218), 2: (156, 204, 101)}
-
+    # 2*8 -> 8*2 8 points with x-y coordinates
     corners = np.array(obstacle.box3d).transpose((1, 0))
     class_name = Obstacle.type_map[obstacle.type.item()]
     score = obstacle.score
@@ -90,6 +90,7 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=True):
     if not from_3d:
         return image
 
+    # x_min, y_min, x_max, y_max
     box_2d = [int(min(obstacle.box3d[0])), int(min(obstacle.box3d[1])), int(max(obstacle.box3d[0])),
               int(max(obstacle.box3d[1]))]
     class_name = Obstacle.type_map[obstacle.type.item()]
@@ -97,7 +98,7 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=True):
     color = color_map[obstacle.type.item()]
     label = class_name + ": " + "%.2f" % score
 
-    # ====================== draw 3d box ======================
+    # ====================== draw 2d box ======================
     cv2.rectangle(image, (box_2d[0], box_2d[1]), (box_2d[2], box_2d[3]), color=color, thickness=2)
     # =========================================================
 

@@ -64,12 +64,13 @@ attack:
   switch_on: true
   target: "WALKER"
   loss:
-    type: "class_threshold"
+    type: "2d_iou"
     threshold: 0.15
+    iou: 0.05
   optimizer:
-    alpha: 0.002
+    alpha: 0.003
     clip_min: 0.0
-    clip_max: 0.3
+    clip_max: 0.5
 
 
 visualization:

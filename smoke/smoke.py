@@ -1,8 +1,5 @@
 import os.path as osp
 
-import copy
-import sys
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -27,10 +24,6 @@ class Smoke(nn.Module):
         model_path = osp.join(global_args["project_path"], args["model_path"])
         self.model_path = model_path
         self.model = None
-        # if osp.exists(model_path):
-        #     self._model = torch.jit.load(model_path, map_location=self.device)
-        # else:
-        #     self._model = None
         # input params
         self.K = self.getIntrinsicMatrix(K=args["K"],
                                          is_inverse=False,
