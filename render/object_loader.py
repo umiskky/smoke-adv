@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from pytorch3d.io import load_objs_as_meshes
 from pytorch3d.transforms import Transform3d, Scale, RotateAxisAngle, Translate
-
+# import pytorch3d.renderer.mesh.textures
 
 class ObjectLoader(nn.Module):
     def __init__(self, args: dict, global_args: dict) -> None:

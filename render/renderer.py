@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pytorch3d.renderer import look_at_view_transform, PerspectiveCameras, AmbientLights, RasterizationSettings, \
-    BlendParams, MeshRenderer, MeshRasterizer, HardPhongShader, PointLights
+    BlendParams, MeshRenderer, MeshRasterizer, HardPhongShader, PointLights, SoftPhongShader
 
 
 class Renderer(nn.Module):
@@ -27,6 +27,8 @@ class Renderer(nn.Module):
                        light_type=args["light"]["type"])
         self.set_render(quality_rate=args["render"]["quality_rate"],
                         img_size=self.scenario_size,
+                        sigma=float(args["render"]["sigma"]),
+                        gamma=float(args["render"]["gamma"]),
                         background_color=self.background_color)
 
         self.visualization = {}
@@ -39,75 +41,6 @@ class Renderer(nn.Module):
         # 0~255.0
         synthesis_img = synthesis_normalized_img * 255.0
         return synthesis_img, self.box_pseudo_gt
-
-    def set_camera(self, height, K, img_size):
-        """
-        Set camera position and parameters.\n
-        :param height: height of the camera to the ground.
-        :param K: 3x3 camera intrinsic matrix.
-        :param img_size: tuple(h, w) used for ndc coordinate.
-        :return: None
-        """
-        # World Coordinate   Camera Coordinate
-        #             back to front
-        #        ^ y                ^ y
-        #        |                  |
-        #      z ⊙--> x      x <-- ⊕ z
-        # camera position in world: (0, h, 0). h is the height of the camera to the ground.
-        R, T = look_at_view_transform(eye=((0, height, 0),), at=((0, height, -1),), device=self.device)
-        self.camera = PerspectiveCameras(focal_length=((K[0, 0], K[1, 1]),),
-                                         principal_point=((K[0, 2], K[1, 2]),),
-                                         in_ndc=False,
-                                         image_size=(img_size,),
-                                         R=R,
-                                         T=T,
-                                         device=self.device)
-
-    def set_light(self, light_args: dict, light_type="point"):
-        """
-        TODO light settings.
-        :return:
-        """
-        if "ambient" == light_type:
-            self.light = AmbientLights(device=self.device)
-        if "point" == light_type:
-            self.light = PointLights(ambient_color=(tuple(light_args["ambient_color"]),),
-                                     diffuse_color=(tuple(light_args["diffuse_color"]),),
-                                     specular_color=(tuple(light_args["specular_color"]),),
-                                     location=(tuple(light_args["location"]),),
-                                     device=self.device)
-
-    def set_render(self, quality_rate, img_size, background_color=(0.0, 0.0, 0.0)):
-        """
-        Set renderer parameters.\n
-        :param quality_rate: quality rate, used for render quality.
-        :param img_size: output image size.
-        :param background_color: render background.
-        :return: None
-        """
-        assert self.camera is not None
-        assert self.light is not None
-        # Rasterization Setting
-        raster_settings = RasterizationSettings(
-            image_size=(img_size[0] * quality_rate, img_size[1] * quality_rate),
-        )
-        # Blend Setting
-        blendParams = BlendParams(
-            background_color=background_color,
-        )
-        # Renderer
-        self.renderer = MeshRenderer(
-            rasterizer=MeshRasterizer(
-                cameras=self.camera,
-                raster_settings=raster_settings
-            ),
-            shader=HardPhongShader(
-                device=self.device,
-                cameras=self.camera,
-                lights=self.light,
-                blend_params=blendParams
-            )
-        )
 
     def render(self, mesh, target) -> torch.Tensor:
         assert self.renderer is not None
@@ -163,6 +96,79 @@ class Renderer(nn.Module):
             mask = mask.index_put(mask_indexes, torch.tensor([0.0, 0.0, 0.0], device=self.device))
             synthesis_img = target * mask + mesh_in_back
         return synthesis_img
+
+    def set_camera(self, height, K, img_size):
+        """
+        Set camera position and parameters.\n
+        :param height: height of the camera to the ground.
+        :param K: 3x3 camera intrinsic matrix.
+        :param img_size: tuple(h, w) used for ndc coordinate.
+        :return: None
+        """
+        # World Coordinate   Camera Coordinate
+        #             back to front
+        #        ^ y                ^ y
+        #        |                  |
+        #      z ⊙--> x      x <-- ⊕ z
+        # camera position in world: (0, h, 0). h is the height of the camera to the ground.
+        R, T = look_at_view_transform(eye=((0, height, 0),), at=((0, height, -1),), device=self.device)
+        self.camera = PerspectiveCameras(focal_length=((K[0, 0], K[1, 1]),),
+                                         principal_point=((K[0, 2], K[1, 2]),),
+                                         in_ndc=False,
+                                         image_size=(img_size,),
+                                         R=R,
+                                         T=T,
+                                         device=self.device)
+
+    def set_light(self, light_args: dict, light_type="point"):
+        """
+        TODO light settings.
+        :return:
+        """
+        if "ambient" == light_type:
+            self.light = AmbientLights(device=self.device)
+        if "point" == light_type:
+            self.light = PointLights(ambient_color=(tuple(light_args["ambient_color"]),),
+                                     diffuse_color=(tuple(light_args["diffuse_color"]),),
+                                     specular_color=(tuple(light_args["specular_color"]),),
+                                     location=(tuple(light_args["location"]),),
+                                     device=self.device)
+
+    def set_render(self, quality_rate, img_size, sigma=1e-4, gamma=1e-4, background_color=(0.0, 0.0, 0.0)):
+        """
+        Set renderer parameters.\n
+        :param gamma:
+        :param sigma:
+        :param quality_rate: quality rate, used for render quality.
+        :param img_size: output image size.
+        :param background_color: render background.
+        :return: None
+        """
+        assert self.camera is not None
+        assert self.light is not None
+        # Rasterization Setting
+        raster_settings = RasterizationSettings(
+            image_size=(img_size[0] * quality_rate, img_size[1] * quality_rate),
+        )
+        # Blend Setting
+        blendParams = BlendParams(
+            background_color=background_color,
+            sigma=sigma,
+            gamma=gamma,
+        )
+        # Renderer
+        self.renderer = MeshRenderer(
+            rasterizer=MeshRasterizer(
+                cameras=self.camera,
+                raster_settings=raster_settings
+            ),
+            shader=SoftPhongShader(
+                device=self.device,
+                cameras=self.camera,
+                lights=self.light,
+                blend_params=blendParams
+            )
+        )
 
     @staticmethod
     def get_normalized_img_tensor(image: np.ndarray, device=torch.device("cpu")):

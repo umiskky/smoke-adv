@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 import torch
+from comet_ml import Experiment
 from matplotlib import pyplot as plt
+
+from tools.timer import time_block, time_func
 
 
 def plot_img(image: np.ndarray, title: str, dpi=400):
@@ -28,6 +31,16 @@ def save_img(image: np.ndarray, path: str, is_BGR=False):
         cv2.imwrite(path, image, [cv2.IMWRITE_PNG_COMPRESSION, 4])
     else:
         cv2.imwrite(path, image[:, :, ::-1], [cv2.IMWRITE_PNG_COMPRESSION, 4])
+
+
+@time_func
+def log_img(logger: Experiment, image: np.ndarray, img_name: str, step=None):
+    assert isinstance(image, np.ndarray)
+    image = image.copy()
+    if image.dtype == np.float64 or image.dtype == np.float32:
+        image = image * 255.0
+        image = image.astype(np.uint8)
+    logger.log_image(image_data=image, name=img_name, step=step)
 
 
 @DeprecationWarning

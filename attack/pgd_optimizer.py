@@ -34,6 +34,7 @@ class PGDOptimizer(top.Optimizer):
                     perturbation = alpha * torch.sign(d_param)
                     param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] += \
                         perturbation[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]]
-                    param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]].clamp_(min=clip_min, max=clip_max)
+                    param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] = \
+                        torch.clamp(param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]], min=clip_min, max=clip_max)
                 param.requires_grad_(False)
                 pass

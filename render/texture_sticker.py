@@ -21,6 +21,8 @@ class TextureSticker(nn.Module):
         if "hls" == self.sticker_type:
             self.patch = TextureSticker.init_hls_patch(size=args["size"],
                                                        position=args["position"],
+                                                       min_=args["clip_min"],
+                                                       max_=args["clip_max"],
                                                        texture_shape=args["texture"],
                                                        require_grad=self.is_attack,
                                                        device=self.device)
@@ -99,8 +101,11 @@ class TextureSticker(nn.Module):
         return None
 
     @staticmethod
-    def init_hls_patch(size, position, texture_shape, require_grad=False, device=torch.device("cpu")):
-        sticker = TextureSticker.generate_uniform_tensor(size, device=device)
+    def init_hls_patch(size, position, min_, max_, texture_shape, require_grad=False, device=torch.device("cpu")):
+        sticker = TextureSticker.generate_uniform_tensor(size,
+                                                         min_=min_,
+                                                         max_=max_,
+                                                         device=device)
         # Add Patch
         x_l, y_l = position
         patch = torch.zeros(texture_shape, device=device)
@@ -110,13 +115,15 @@ class TextureSticker(nn.Module):
         return patch
 
     @staticmethod
-    def generate_uniform_tensor(size, device=torch.device("cpu")):
-        """Generate uniform from -1 to 1"""
+    def generate_uniform_tensor(size, min_: float, max_: float, device=torch.device("cpu")):
+        """Generate uniform from min to max"""
         if isinstance(size, tuple) or isinstance(size, list):
             sticker: torch.Tensor = torch.rand((1, size[0], size[1]), device=device)
-            sticker = torch.mul(sticker.add(-0.5), 2.0)
+            # sticker = torch.mul(sticker.add(-0.5), 2.0)
+            sticker = torch.add(torch.mul(sticker, max_-min_), min_)
 
         else:
             sticker: torch.Tensor = torch.rand((1, size, size), device=device)
-            sticker = torch.mul(sticker.add(-0.5), 2.0)
+            # sticker = torch.mul(sticker.add(-0.5), 2.0)
+            sticker = torch.add(torch.mul(sticker, max_ - min_), min_)
         return sticker

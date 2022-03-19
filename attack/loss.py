@@ -21,7 +21,7 @@ class Loss(nn.Module):
                                           is_inverse=False,
                                           device=torch.device("cpu"))
 
-    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor) -> torch.Tensor:
+    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor):
         box3d_branch_score_filtered = self.filter_with_threshold(box3d_branch, self.threshold)
         box3d_branch_target_filtered = self.filter_with_target(box3d_branch_score_filtered, self.target)
         if "class" == self.type:

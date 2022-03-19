@@ -1,7 +1,8 @@
 newmtl man_mat
-map_Kd texture.jpg
-Ka 0 0 0
+Ka 0.1 0.1 0.1
 Kd 1 1 1
-Ks 0.02999999932944774 0.02999999932944774 0.02999999932944774
-Ns 2
+Ni 1.53
+illum 3
+map_Kd texture.jpg
+map_Ka texture.jpg
 

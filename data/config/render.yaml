@@ -1,0 +1,102 @@
+global:
+  device: "cuda:0"
+  project_path: "/home/dingxl/workspace/smoke-adv/"
+  attack: true
+
+object:
+  switch_on: true
+  obj_path: "data/objects/man/man.obj"
+  model_matrix:
+    scale: 0.0085
+    rotation: [0, 185, 0]
+    translate: [4, 0, -10]
+
+stickers:
+  switch_on: true
+  type: "hls"
+  size: [8192, 8192]
+  position: [0, 0]
+  intensity: 1.0
+  texture: [1, 3, 8192, 8192]
+  mask:
+    half_sleeve: "data/objects/man/mask_half_sleeve.jpg"
+    # jeans: "data/objects/man/mask_jeans.jpg"
+
+scenario:
+  waymo_index: "0002045"
+  scenario_dir: "data/datasets/waymo/kitti_format/training/image_0/"
+  calib_dir: "data/datasets/waymo/kitti_format/training/calib/"
+
+renderer:
+  switch_on: true
+  camera:
+    height: 1.85
+  light:
+    type: "point"
+    ambient_color: [0.28, 0.28, 0.28]
+    diffuse_color: [0.25, 0.25, 0.25]
+    specular_color: [0.0, 0.0, 0.0]
+    location: [10, 8, -6]
+  render:
+    quality_rate: 1
+    background_color: [0.0, 0.0, 0.0]
+    sigma: 1e-6
+    gamma: 1e-10
+
+defense:
+  switch_on: false
+
+smoke:
+  device: "cuda:0"
+  switch_on: false
+  model_path: "data/model/smoke_libtorch_model.pth"
+  confidence_threshold: 0.15
+  transform:
+    mean: [0.0, 0.0, 0.0]
+    std: [58.395, 57.12, 57.375]
+  down_ratio: [4, 4]
+  shape:
+    shape_input: [1, 640, 960, 3]
+    shape_k: [1, 3, 3]
+    shape_ratio: [1, 2]
+    shape_box3d_branch: [1, 1, 50, 14]
+    shape_feat: [1, 64, 160, 240]
+
+attack:
+  switch_on: false
+  save: false
+  target: "WALKER"
+  loss:
+    type: "2d_iou"
+    threshold: -1
+    iou: 0.05
+  optimizer:
+    alpha: 0.0002
+    clip_min: -0.001
+    clip_max: 0.001
+
+
+visualization:
+  save: false
+  plot: true
+  # TODO
+  sticker: false
+  # Texture Visualization exists Bottleneck
+  texture: false
+  scenario: false
+  render_bg: true
+  render_scenario: true
+  detection_3d: false
+  detection_2d: false
+
+logger:
+  enable: true
+  test_pipeline: true
+  # type: ["comet_online", "comet_offline"]
+  type: "comet_online"
+  api_key: "RW35BFzUi7t9VGybaFDUkWMF8"
+  project_name: "smoke-adv"
+  workspace: "umiskky"
+  offline_dir: "data/results/"
+
+

@@ -25,6 +25,8 @@ class Attack(nn.Module):
         args.cfg_smoke["scenario_size"] = self.scenario.scenario_size
         args.cfg_attack["K"] = self.scenario.K
         args.cfg_attack["scenario_size"] = self.scenario.scenario_size
+        args.cfg_stickers["clip_min"] = args.cfg_attack["optimizer"]["clip_min"]
+        args.cfg_stickers["clip_max"] = args.cfg_attack["optimizer"]["clip_max"]
         # =====================================================
 
         # ==================== load object ====================
@@ -97,13 +99,6 @@ class Attack(nn.Module):
             if self.loss is not None:
                 loss = self.loss.forward(box_pseudo_gt=box_pseudo_gt,
                                          box3d_branch=box3d_branch)
-
-        # Visualization Pipeline
-        with torch.no_grad():
-            self.visualization.vis(scenario=self.scenario,
-                                   renderer=self.renderer,
-                                   stickers=self.stickers,
-                                   smoke=self.smoke)
 
         # Result Setting
         result_list = [loss, box3d_branch, synthesis_img, scenario]

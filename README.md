@@ -37,6 +37,7 @@
 
 ---
 - Note
+
 - Coordinate System Define
   -  ![coordinate_systems](data/docs/image/coordinate_systems.png)
   - World Coordinate
@@ -55,9 +56,16 @@
       #  x <-- ⊕ z
       ```
   - Image Coordinate
+  
 - Pytorch 3D
   - ![](data/docs/image/architecture_renderer.jpg)
   - ![](data/docs/image/transforms_overview.jpg)
+
+- ![render](data/docs/image/render.png)
+  - shading分为phong和gouraud两种方法
+    - gouraud先计算三角形顶点光照和着色，插值计算三角形区域其他像素着色。
+    - phong对像素附近顶点法向量进行插值计算，最后用像素法向量和光照计算着色。
+  - shader pytorch3d有5种：分别对应soft和hard的phong与gouraud，以及轮廓渲染。soft与hard区别于是否使用概率图计算最后像素颜色还是只取最近的三角形像素颜色。soft有两个参数$$\sigma $$和$$\gamma$$，分别控制渲染的尖锐程度与透明度。
 
 ### 4. Attack
 
@@ -69,11 +77,11 @@
 ---
 
 # TODO List
-- [ ] 增加日志记录，接入comet.ml
+- [x] 增加日志记录，接入comet.ml
 - [ ] 渲染质量高，会出现渲染缺失问题
 - [ ] 渲染质量低，出现纹理贴图多个像素点对应渲染的一个像素
 - [ ] 3D人物模型置信度2D-CP定位
-- [ ] 3D人物模型置信度2D-GT定位
+- [x] 3D人物模型置信度2D-GT定位
 - [ ] 3D人物模型置信度3D-GT定位
 - [ ] 3D人物模型多角度渲染攻击
 - [ ] 3D人物模型多位置渲染攻击
