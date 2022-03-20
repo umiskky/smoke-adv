@@ -6,7 +6,7 @@ from render.renderer import Renderer
 from render.scenario import Scenario
 from render.texture_sticker import TextureSticker
 from smoke.smoke import Smoke
-from tools.utils import get_utc8_time, makedirs
+from tools.utils import makedirs
 from tools.visualization.vis_detection import draw_3d_boxes, draw_2d_boxes
 from tools.visualization.vis_render import plot_img, save_img, log_img
 
@@ -27,7 +27,7 @@ class Visualization:
             self.init_dir()
         # counter
         self.counter = 0
-        # switch for figure plot only once
+        # enable for figure plot only once
         self.once = True
 
     def vis(self, scenario: Scenario, renderer: Renderer, stickers: TextureSticker, smoke: Smoke):

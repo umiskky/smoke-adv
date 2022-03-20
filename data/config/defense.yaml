@@ -12,7 +12,7 @@ object:
     translate: [4, 0, -10]
 
 stickers:
-  switch_on: true
+  enable: true
   device: "cuda:0"
   type: "hls"
   size: [1200, 1200]
@@ -25,7 +25,7 @@ scenario:
   scenario_dir: "data/datasets/waymo/kitti_format/training/image_0/"
 
 renderer:
-  switch_on: true
+  enable: true
   device: "cuda:0"
   camera:
     height: 1.85
@@ -40,7 +40,7 @@ renderer:
     background_color: [0.0, 0.0, 0.0]
 
 defense:
-  switch_on: false
+  enable: false
   device: "cuda:0"
 
 smoke:
@@ -56,7 +56,7 @@ smoke:
     shape_feat: [1, 64, 160, 240]
 
 attack:
-  switch_on: false
+  enable: false
   optimizer:
     iters: 10
 

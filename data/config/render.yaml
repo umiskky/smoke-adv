@@ -4,7 +4,7 @@ global:
   attack: true
 
 object:
-  switch_on: true
+  enable: true
   obj_path: "data/objects/man/man.obj"
   model_matrix:
     scale: 0.0085
@@ -12,7 +12,7 @@ object:
     translate: [4, 0, -10]
 
 stickers:
-  switch_on: true
+  enable: true
   type: "hls"
   size: [8192, 8192]
   position: [0, 0]
@@ -28,7 +28,7 @@ scenario:
   calib_dir: "data/datasets/waymo/kitti_format/training/calib/"
 
 renderer:
-  switch_on: true
+  enable: true
   camera:
     height: 1.85
   light:
@@ -44,11 +44,11 @@ renderer:
     gamma: 1e-10
 
 defense:
-  switch_on: false
+  enable: false
 
 smoke:
   device: "cuda:0"
-  switch_on: false
+  enable: false
   model_path: "data/model/smoke_libtorch_model.pth"
   confidence_threshold: 0.15
   transform:
@@ -63,7 +63,7 @@ smoke:
     shape_feat: [1, 64, 160, 240]
 
 attack:
-  switch_on: false
+  enable: false
   save: false
   target: "WALKER"
   loss:

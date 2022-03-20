@@ -18,8 +18,9 @@ def parse_args():
         "--config",
         "-f",
         dest="cfg",
+        default="./data/config/attack_patch.yaml",
         # default="./data/config/render.yaml",
-        default="./data/config/attack.yaml",
+        # default="./data/config/attack.yaml",
         help="The config file path.",
         required=False,
         type=str)
@@ -31,7 +32,7 @@ def main(args):
     logger = cfg.logger
     attack = Attack(cfg)
 
-    if attack.loss is not None and cfg.cfg_attack["switch_on"]:
+    if attack.loss is not None and cfg.cfg_attack["enable"]:
         pgd = PGDOptimizer(params=[attack.stickers.patch],
                            alpha=cfg.cfg_attack["optimizer"]["alpha"],
                            clip_min=cfg.cfg_attack["optimizer"]["clip_min"],
@@ -41,50 +42,49 @@ def main(args):
         es = EarlyStop(max_step=60)
         flag = True
         epoch = 0
-        with logger.train():
-            while flag:
-                try:
-                    with time_block("Forward"):
-                        pgd.zero_grad()
-                        loss = attack.forward()
-                    with time_block("Backward & Step"):
-                        loss.backward()
-                        pgd.step()
-                except KeyboardInterrupt:
-                    print("Stop Attack Manually!")
-                    cfg.close_logger()
-                    break
+        while flag:
+            try:
+                with time_block("Forward"):
+                    pgd.zero_grad()
+                    loss = attack.forward()
+                with time_block("Backward & Step"):
+                    loss.backward()
+                    pgd.step()
+            except KeyboardInterrupt:
+                print("Stop Attack Manually!")
+                cfg.close_logger()
+                break
 
-                with torch.no_grad():
-                    _loss = loss.clone().cpu().item() * -1
-                    _patch = attack.stickers.patch.detach().clone().cpu().numpy()
-                    # Visualization Pipeline
-                    attack.visualization.counter = epoch
-                    with time_block("Vis"):
-                        attack.visualization.vis(scenario=attack.scenario,
-                                                 renderer=attack.renderer,
-                                                 stickers=attack.stickers,
-                                                 smoke=attack.smoke)
-                    # TODO
-                    # save texture patch
-                    if cfg.cfg_attack["switch_on"] and cfg.cfg_attack["save"]:
-                        state_dict = {"patch": _patch, "epoch": epoch, "loss": _loss}
-                        state_saving(state=state_dict, epoch=epoch, loss=_loss, path=attack.visualization.experiment_path)
-                    # print to terminal
-                    print("epoch: %05d" % epoch + "   " + "loss: %.5f" % _loss)
-                    logger.log_metric("loss", abs(_loss), step=epoch)
-                    # Stop Train
-                    if _loss <= 0:
-                        flag = False
-                    else:
-                        flag = es.step(_loss)
-                    epoch += 1
-                try:
-                    pass
-                except KeyboardInterrupt:
-                    print("Stop Attack Manually!")
-                    cfg.close_logger()
+            with torch.no_grad():
+                _loss = loss.clone().cpu().item() * -1
+                _patch = attack.stickers.patch.detach().clone().cpu().numpy()
+                # Visualization Pipeline
+                attack.visualization.counter = epoch
+                with time_block("Vis"):
+                    attack.visualization.vis(scenario=attack.scenario,
+                                             renderer=attack.renderer,
+                                             stickers=attack.stickers,
+                                             smoke=attack.smoke)
+                # TODO
+                # save texture patch
+                if cfg.cfg_attack["enable"] and cfg.cfg_attack["save"]:
+                    state_dict = {"patch": _patch, "epoch": epoch, "loss": _loss}
+                    state_saving(state=state_dict, epoch=epoch, loss=_loss, path=attack.visualization.experiment_path)
+                # print to terminal
+                print("epoch: %05d" % epoch + "   " + "loss: %.5f" % _loss)
+                logger.log_metric("loss", _loss, step=epoch)
+                # Stop Train
+                if _loss <= 0:
                     flag = False
+                else:
+                    flag = es.step(_loss)
+                epoch += 1
+            try:
+                pass
+            except KeyboardInterrupt:
+                print("Stop Attack Manually!")
+                cfg.close_logger()
+                flag = False
     else:
         attack.forward()
         attack.visualization.vis(scenario=attack.scenario,

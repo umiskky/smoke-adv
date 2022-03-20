@@ -75,7 +75,7 @@ def draw_2d_boxes(image, obstacles, color_map=None, from_3d=True):
     return image
 
 
-def draw_2d_box(image, obstacle, color_map=None, from_3d=True):
+def draw_2d_box(image, obstacle, color_map=None, from_3d=False):
     """
     绘制单个障碍物的2D Box.\n
     :param image: np.uint8 type np.ndarray of image.
@@ -86,13 +86,12 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=True):
     """
     if color_map is None:
         color_map = {0: (255, 167, 38), 1: (38, 198, 218), 2: (156, 204, 101)}
-    # TODO 目前只能从3D Box近似2D Box
-    if not from_3d:
-        return image
-
-    # x_min, y_min, x_max, y_max
-    box_2d = [int(min(obstacle.box3d[0])), int(min(obstacle.box3d[1])), int(max(obstacle.box3d[0])),
-              int(max(obstacle.box3d[1]))]
+    if from_3d:
+        # x_min, y_min, x_max, y_max
+        box_2d = [int(min(obstacle.box3d[0])), int(min(obstacle.box3d[1])), int(max(obstacle.box3d[0])),
+                  int(max(obstacle.box3d[1]))]
+    else:
+        box_2d = obstacle.box2d
     class_name = Obstacle.type_map[obstacle.type.item()]
     score = obstacle.score
     color = color_map[obstacle.type.item()]

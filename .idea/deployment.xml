@@ -16,6 +16,7 @@
           </mappings>
           <excludedPaths>
             <excludedPath path="/home/dingxl/workspace/smoke-adv/data/datasets" />
+            <excludedPath path="/home/dingxl/workspace/smoke-adv/data/results" />
           </excludedPaths>
         </serverdata>
       </paths>

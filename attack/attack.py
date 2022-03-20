@@ -30,35 +30,35 @@ class Attack(nn.Module):
         # =====================================================
 
         # ==================== load object ====================
-        if args.cfg_object["switch_on"] and args.cfg_renderer["switch_on"]:
+        if args.cfg_object["enable"] and args.cfg_renderer["enable"]:
             self.object_loader = ObjectLoader(args.cfg_object, args.cfg_global)
         else:
             self.object_loader = None
         # =====================================================
 
         # =================== load renderer ===================
-        if args.cfg_renderer["switch_on"]:
+        if args.cfg_renderer["enable"]:
             self.renderer = Renderer(args.cfg_renderer)
         else:
             self.renderer = None
         # =====================================================
 
         # =================== load stickers ===================
-        if args.cfg_stickers["switch_on"]:
+        if args.cfg_stickers["enable"]:
             self.stickers = TextureSticker(args.cfg_stickers, args.cfg_global)
         else:
             self.stickers = None
         # =====================================================
 
         # =================== load defense ====================
-        if args.cfg_defense["switch_on"]:
+        if args.cfg_defense["enable"]:
             self.defense = None
         else:
             self.defense = None
         # =====================================================
 
         # ==================== load smoke =====================
-        if args.cfg_smoke["switch_on"]:
+        if args.cfg_smoke["enable"]:
             self.smoke = Smoke(args.cfg_smoke, args.cfg_global)
         else:
             self.smoke = None
@@ -66,7 +66,7 @@ class Attack(nn.Module):
 
         # ==================== load attack ====================
         # TODO
-        if args.cfg_attack["switch_on"]:
+        if args.cfg_attack["enable"]:
             self.attack = None
             self.loss = Loss(args.cfg_attack)
         else:

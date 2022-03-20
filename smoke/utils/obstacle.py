@@ -1,3 +1,5 @@
+import numpy as np
+
 import torch
 
 from smoke.utils import affine_utils
@@ -71,6 +73,7 @@ class Obstacle:
                     obstacle.location = pred_locations[idx].numpy().tolist()
                     obstacle.rotation_y = pred_rotation_y[idx].numpy().tolist()
                     obstacle.box3d = box3d_image[idx].numpy().tolist()
+                    obstacle.box2d = total_pred[idx][2:6].numpy().astype(np.int32).tolist()
                     obstacle.score = total_pred[idx][-1].item()
                     obstacle_list.append(obstacle)
 

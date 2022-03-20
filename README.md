@@ -11,9 +11,10 @@
   - ![img.png](data/docs/image/output.png)
   - class 为识别的类别：0: "CAR", 1: "CYCLIST", 2: "PEDESTRIAN"
   - alpha 对应绕相机y轴的旋转角，对应alpha_z
-  - ~~2D Box Coordinate 为2D Box坐标~~
+  - 2D Box Coordinate 为2D Box的left_top和right_bottom坐标
   - 3D Box Dimension 对应3D Box的h、l、w
   - 3D Box Center Coordinate 对应车底盘中心点在相机坐标系下的坐标，注意不是车体中心点
+  - 倒数第二维可能是预测2D与3D中心点偏移量？
   - score 对应识别物体的置信度
 
 ### 2. Kitti/Waymo Dataset Scenarios
@@ -60,7 +61,8 @@
 - Pytorch 3D
   - ![](data/docs/image/architecture_renderer.jpg)
   - ![](data/docs/image/transforms_overview.jpg)
-
+  - ![image-20220319143616696](./data/docs/image/pytorch3d_overview.png)
+  
 - ![render](data/docs/image/render.png)
   - shading分为phong和gouraud两种方法
     - gouraud先计算三角形顶点光照和着色，插值计算三角形区域其他像素着色。
@@ -76,30 +78,5 @@
 
 ---
 
-# TODO List
-- [x] 增加日志记录，接入comet.ml
-- [ ] 渲染质量高，会出现渲染缺失问题
-- [ ] 渲染质量低，出现纹理贴图多个像素点对应渲染的一个像素
-- [ ] 3D人物模型置信度2D-CP定位
-- [x] 3D人物模型置信度2D-GT定位
-- [ ] 3D人物模型置信度3D-GT定位
-- [ ] 3D人物模型多角度渲染攻击
-- [ ] 3D人物模型多位置渲染攻击
-- [ ] 3D人物模型多场景渲染攻击
 
 
-
-# 组会记录
-
----
-
-## 3月10日
-- ransac 外参标定
-- 确定3D模型所在位置，造假的GT，能不能渲染模型到真人身后
-- 考虑攻击分类器置信度之外，3D Box回归框进行攻击，比如让预测的回归框大小变化
-- 24号字
-- 光照问题，可以通过图像匹配算法，风格。。。
-- 定位问题
-  - 3D GT IOU 定位
-  - MASK 2D 定位
-  - 中心点定位

@@ -14,8 +14,8 @@ object:
 stickers:
   enable: true
   type: "hls"
-  size: [8192, 8192]
-  position: [0, 0]
+  size: [1200, 1200]
+  position: [4600, 5600]
   intensity: 1.0
   texture: [1, 3, 8192, 8192]
   mask:
@@ -91,7 +91,7 @@ visualization:
 
 logger:
   enable: true
-  test_pipeline: true
+  test_pipeline: false
   # type: ["comet_online", "comet_offline"]
   type: "comet_online"
   api_key: "RW35BFzUi7t9VGybaFDUkWMF8"

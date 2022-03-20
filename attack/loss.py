@@ -28,6 +28,17 @@ class Loss(nn.Module):
             return self.get_class_loss(box3d_branch_target_filtered)
         if "2d_iou" == self.type:
             assert self.iou >= 0
+            box_2d = box3d_branch_target_filtered.detach().clone() \
+                if box3d_branch_target_filtered.requires_grad \
+                else box3d_branch_target_filtered.clone()
+            box_2d = box_2d[:, 2:6]
+            return self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
+                                           iou_threshold=self.iou,
+                                           box_2d_gt=box_pseudo_gt["2d"],
+                                           box_2d=box_2d)
+        # Get 2D Box from 3D Box
+        if "2d_iou_fake" == self.type:
+            assert self.iou >= 0
             _, box_2d = self.decode_boxes(box3d_branch=box3d_branch_target_filtered,
                                           K=self.K,
                                           ori_img_size=self.scenario_size)
@@ -82,6 +93,7 @@ class Loss(nn.Module):
 
     @staticmethod
     def decode_boxes(box3d_branch: torch.Tensor, K: torch.Tensor, ori_img_size) -> (torch.Tensor, torch.Tensor):
+        """decode 3D Box to get 2D Box"""
         with torch.no_grad():
             if box3d_branch.requires_grad:
                 box3d_branch_copy = box3d_branch.detach().clone().cpu()
