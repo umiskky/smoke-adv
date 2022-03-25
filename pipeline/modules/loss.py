@@ -3,7 +3,7 @@ import torch.nn as nn
 import torchvision.ops as tvo
 
 from smoke.smoke import Smoke
-from smoke.utils import affine_utils
+from smoke.utils import AffineUtils
 
 
 class Loss(nn.Module):
@@ -16,12 +16,8 @@ class Loss(nn.Module):
         self.threshold = args["loss"]["threshold"]
         self.iou = args["loss"]["iou"]
         self.target = self.target_map[args["target"]]
-        self.scenario_size = args["scenario_size"]
-        self.K = Smoke.getIntrinsicMatrix(K=args["K"],
-                                          is_inverse=False,
-                                          device=torch.device("cpu"))
 
-    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor):
+    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor, K=None, scenario_size=None):
         box3d_branch_score_filtered = self.filter_with_threshold(box3d_branch, self.threshold)
         box3d_branch_target_filtered = self.filter_with_target(box3d_branch_score_filtered, self.target)
         if "class" == self.type:
@@ -37,11 +33,15 @@ class Loss(nn.Module):
                                            box_2d_gt=box_pseudo_gt["2d"],
                                            box_2d=box_2d)
         # Get 2D Box from 3D Box
-        if "2d_iou_fake" == self.type:
+        if "2d_iou_fake" == self.type and K is not None:
             assert self.iou >= 0
+            assert scenario_size is not None
+            K = Smoke.getIntrinsicMatrix(K=K,
+                                         is_inverse=False,
+                                         device="cpu")
             _, box_2d = self.decode_boxes(box3d_branch=box3d_branch_target_filtered,
-                                          K=self.K,
-                                          ori_img_size=self.scenario_size)
+                                          K=K,
+                                          ori_img_size=scenario_size)
             return self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
                                            iou_threshold=self.iou,
                                            box_2d_gt=box_pseudo_gt["2d"],
@@ -102,10 +102,10 @@ class Loss(nn.Module):
             pred_alpha = box3d_branch_copy[:, 1]
             pred_dimensions = box3d_branch_copy[:, 6:9].roll(shifts=1, dims=1)
             pred_locations = box3d_branch_copy[:, 9:12]
-            pred_rotation_y = affine_utils.alpha2rotation_y_N(pred_alpha, pred_locations[:, 0], pred_locations[:, 2])
+            pred_rotation_y = AffineUtils.alpha2rotation_y_N(pred_alpha, pred_locations[:, 0], pred_locations[:, 2])
             # N*2*8 -> N*8*2
-            box3d = affine_utils.recovery_3d_box(pred_rotation_y, pred_dimensions,
-                                                 pred_locations, K, ori_img_size).permute(0, 2, 1)
+            box3d = AffineUtils.recovery_3d_box(pred_rotation_y, pred_dimensions,
+                                                pred_locations, K, ori_img_size).permute(0, 2, 1)
             box3d_ = box3d.clone()
             # N*4 4->[x_min, y_min, x_max, y_max]
             box2d = torch.cat((box3d_.min(dim=1).values, box3d_.max(dim=1).values), dim=1)

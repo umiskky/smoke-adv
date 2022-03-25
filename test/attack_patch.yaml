@@ -17,8 +17,8 @@ stickers:
   mask:
     half_sleeve: "data/objects/man/mask_half_sleeve.jpg"
 #    jeans: "data/objects/man/mask_jeans.jpg"
-  size: [ 8192, 8192 ]
-  position: [ 0, 0 ]
+  size: [1200, 1200]
+  position: [4600, 5600]
 
 attack:
   loss:
@@ -32,8 +32,5 @@ attack:
 logger:
   common:
       confidence_threshold: 0.15
-  comet:
-    enable: true
-    test: true
 
 

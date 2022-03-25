@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
+from comet_ml import Experiment
+from matplotlib import pyplot as plt
 
-from smoke.utils.obstacle import Obstacle
+from smoke.obstacle import Obstacle
 
 
 def draw_3d_boxes(image, obstacles, color_map=None):
@@ -91,7 +93,7 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=False):
         box_2d = [int(min(obstacle.box3d[0])), int(min(obstacle.box3d[1])), int(max(obstacle.box3d[0])),
                   int(max(obstacle.box3d[1]))]
     else:
-        box_2d = obstacle.box2d
+        box_2d = list(map(int, obstacle.box2d))
     class_name = Obstacle.type_map[obstacle.type.item()]
     score = obstacle.score
     color = color_map[obstacle.type.item()]
@@ -111,3 +113,38 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=False):
     # =========================================================
 
     return image
+
+
+def plot_img(image: np.ndarray, title: str, dpi=400):
+    assert isinstance(image, np.ndarray)
+    image = image.copy()
+    plt.figure(dpi=dpi)
+    if image.dtype == np.float64:
+        image = image.astype(np.float32)
+    plt.imshow(image)
+    plt.title(title)
+    plt.grid("off")
+    plt.axis('off')
+    plt.show()
+    plt.close()
+
+
+def save_img(image: np.ndarray, path: str, is_BGR=False):
+    assert isinstance(image, np.ndarray)
+    image = image.copy()
+    if image.dtype == np.float64 or image.dtype == np.float32:
+        image = image * 255.0
+        image = image.astype(np.uint8)
+    if is_BGR:
+        cv2.imwrite(path, image, [cv2.IMWRITE_PNG_COMPRESSION, 4])
+    else:
+        cv2.imwrite(path, image[:, :, ::-1], [cv2.IMWRITE_PNG_COMPRESSION, 4])
+
+
+def log_img(logger: Experiment, image: np.ndarray, img_name: str, step=None):
+    assert isinstance(image, np.ndarray)
+    image = image.copy()
+    if image.dtype == np.float64 or image.dtype == np.float32:
+        image = image * 255.0
+        image = image.astype(np.uint8)
+    logger.log_image(image_data=image, name=img_name, step=step)

@@ -1,0 +1,112 @@
+global:
+  project_path: "/home/dingxl/workspace/smoke-adv/"
+  device: "cuda:0"
+  seed: 2022
+
+enable:
+  scenario: false
+  object: false
+  stickers: false
+  renderer: false
+  defense: false
+  smoke: false
+  attack: false
+  logger: false
+
+dataset:
+  meta: "data/config/meta.yaml"
+  calib_dir: "data/datasets/waymo/kitti_format/training/calib/"
+
+object:
+  obj_path: "data/objects/man/man.obj"
+
+stickers:
+  type: "hls"
+  # Texture shape
+  texture: [ 1, 3, 8192, 8192 ]
+  # Stickers size & position in texture image.
+  size: [ 100, 100 ]
+  position: [ 0, 0 ]
+#  mask:
+#    half_sleeve: "data/objects/man/mask_half_sleeve.jpg"
+#    jeans: "data/objects/man/mask_jeans.jpg"
+
+scenario:
+  scenario_dir: "data/datasets/waymo/kitti_format/training/image_0/"
+
+renderer:
+  camera:
+    height: 1.85
+  light:
+    type: "point"
+  render:
+    quality_rate: 1
+    background_color: [ 0.0, 0.0, 0.0 ]
+    image_shape: [1920, 1280]
+    sigma: 1e-4
+    gamma: 1e-4
+
+smoke:
+  model_path: "data/model/smoke_libtorch_model.pth"
+  transform:
+    mean: [ 0.0, 0.0, 0.0 ]
+    std: [ 58.395, 57.12, 57.375 ]
+  down_ratio: [ 4, 4 ]
+  shape:
+    shape_input: [ 1, 640, 960, 3 ]
+    shape_k: [ 1, 3, 3 ]
+    shape_ratio: [ 1, 2 ]
+    shape_box3d_branch: [ 1, 1, 50, 14 ]
+    shape_feat: [ 1, 64, 160, 240 ]
+
+attack:
+  target: "WALKER"
+  target_score: 0.0
+  loss:
+    type: "2d_iou"
+    threshold: 0.25
+    iou: 0.05
+  optimizer:
+    alpha: 0.0002
+    clip_min: -0.001
+    clip_max: 0.001
+
+logger:
+   # ============= Common Vis Settings =============
+  common:
+    # setting score threshold for visualization
+    confidence_threshold: 0.25
+  # ================================================
+  # =================== Comet.ml ===================
+  comet:
+    enable: false
+    # Support types: comet_online, comet_offline.
+    type: "comet_online"
+    # Test Comet.ml Pipeline Without Uploading log files.
+    test: false
+    api_key: "RW35BFzUi7t9VGybaFDUkWMF8"
+    project_name: "smoke-adv"
+    workspace: "umiskky"
+    offline_dir: "data/results/"
+    # Support types: texture, scenario, render_bg, render_scenario, detection_3d, detection_2d, TODO Textures.
+    # TODO Using Comet.ml: Texture Visualization exists Bottleneck.
+    vis_content: ["detection_2d", "detection_3d"]
+  # ================================================
+  # ================ python logging ================
+  logging:
+    enable: true
+    # Support types: debug, info, warning, error, crit
+    level: "debug"
+    format: "[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
+  # ================================================
+  # ================ local logging =================
+  local:
+    # Vis Fig in plt(e.g. Pycharm SciView).
+    vis_plt: false
+    # Support types: texture, scenario, render_bg, render_scenario, detection_3d, detection_2d.
+    plt_content: ["detection_2d", "detection_3d"]
+    # Save Fig in your local computer.
+    vis_offline: false
+    # Support types: texture, scenario, render_bg, render_scenario, detection_3d, detection_2d, patch(save).
+    off_content: ["detection_2d", "detection_3d", "scenario"]
+  # ================================================

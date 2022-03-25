@@ -1,0 +1,22 @@
+base: "data/config/base.yaml"
+
+global:
+  project_path: "/home/dingxl/workspace/smoke-adv/"
+  device: "cuda:0"
+
+enable:
+  object: true
+  stickers: false
+  scenario: true
+  renderer: true
+  smoke: false
+  attack: false
+  logger: true
+
+logger:
+  common:
+      confidence_threshold: 0.15
+  local:
+    vis_plt: true
+
+

@@ -1,8 +1,6 @@
-import numpy as np
-
 import torch
 
-from smoke.utils import affine_utils
+from smoke.utils import AffineUtils
 
 
 class Obstacle:
@@ -61,9 +59,9 @@ class Obstacle:
                 # [x, y, z]
                 pred_locations = total_pred[:, 9:12]
                 # pred_alpha -> pred_rotation_y
-                pred_rotation_y = affine_utils.alpha2rotation_y_N(pred_alpha, pred_locations[:, 0], pred_locations[:, 2])
+                pred_rotation_y = AffineUtils.alpha2rotation_y_N(pred_alpha, pred_locations[:, 0], pred_locations[:, 2])
                 # shape=[10, 2, 8]
-                box3d_image = affine_utils.recovery_3d_box(pred_rotation_y, pred_dimensions, pred_locations, k, ori_img_size)
+                box3d_image = AffineUtils.recovery_3d_box(pred_rotation_y, pred_dimensions, pred_locations, k, ori_img_size)
 
                 for idx in range(total_pred.shape[0]):
                     item = total_pred[idx, :]
@@ -73,8 +71,8 @@ class Obstacle:
                     obstacle.location = pred_locations[idx].numpy().tolist()
                     obstacle.rotation_y = pred_rotation_y[idx].numpy().tolist()
                     obstacle.box3d = box3d_image[idx].numpy().tolist()
-                    obstacle.box2d = total_pred[idx][2:6].numpy().astype(np.int32).tolist()
-                    obstacle.score = total_pred[idx][-1].item()
+                    obstacle.box2d = item[2:6].numpy().tolist()
+                    obstacle.score = item[-1].item()
                     obstacle_list.append(obstacle)
 
             return obstacle_list

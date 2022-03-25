@@ -69,14 +69,46 @@
     - phong对像素附近顶点法向量进行插值计算，最后用像素法向量和光照计算着色。
   - shader pytorch3d有5种：分别对应soft和hard的phong与gouraud，以及轮廓渲染。soft与hard区别于是否使用概率图计算最后像素颜色还是只取最近的三角形像素颜色。soft有两个参数$$\sigma $$和$$\gamma$$，分别控制渲染的尖锐程度与透明度。
 
-### 4. Attack
+### 4. Pipeline
 
 ---
 
+- Types:
 
-### 5. Defense
+  - scenario: vis scenario
 
----
+    - ```yaml
 
+  - scenario detection: the detection outcomes of scenario without any renderer
 
+    - ```yaml
 
+  - renderer: vis render outcomes
+
+    - ```yaml
+
+  - renderer detection: the detection outcomes of render in background outcomes
+
+    - ```yaml
+
+  - renderer in scenario detection: the detection outcomes of render in scenario outcomes
+
+    - ```yaml
+      
+      ```
+
+  - attack: whole attack pipeline
+
+    - ```yaml
+      enable:
+        object: true
+        stickers: true
+        scenario: true
+        renderer: true
+        smoke: true
+        attack: true
+        logger: true
+
+  - defense: whole defense pipeline
+
+    - ```yaml
