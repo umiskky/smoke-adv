@@ -30,6 +30,7 @@ class Config:
     def _setting_env(self):
         os.environ["timestamp"] = self._timestamp
         os.environ["project_path"] = self._dic["global"]["project_path"]
+        os.environ["debug"] = str(self._dic["global"]["debug"])
 
     def _broadcast_cfg(self):
         """Broadcast Config File Settings & Setting Environment Variables"""

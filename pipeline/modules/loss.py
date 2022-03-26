@@ -1,16 +1,14 @@
 import torch
-import torch.nn as nn
 import torchvision.ops as tvo
 
 from smoke.smoke import Smoke
 from smoke.utils import AffineUtils
 
 
-class Loss(nn.Module):
+class Loss:
     target_map = {"CAR": 0, "CYCLIST": 1, "WALKER": 2}
 
     def __init__(self, args: dict) -> None:
-        super().__init__()
         self.device = args["device"]
         self.type = args["loss"]["type"]
         self.threshold = args["loss"]["threshold"]

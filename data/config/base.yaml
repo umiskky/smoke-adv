@@ -2,6 +2,8 @@ global:
   project_path: "/home/dingxl/workspace/smoke-adv/"
   device: "cuda:0"
   seed: 2022
+  # use for performance test
+  debug: false
 
 enable:
   scenario: false

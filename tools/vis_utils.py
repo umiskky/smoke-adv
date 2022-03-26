@@ -66,7 +66,7 @@ def draw_3d_box(image, obstacle, color_map=None):
     return image
 
 
-def draw_2d_boxes(image, obstacles, color_map=None, from_3d=True):
+def draw_2d_boxes(image, obstacles, color_map=None, from_3d=False):
     assert isinstance(image, np.ndarray)
     image = image.copy()
     if image.dtype == np.float64 or image.dtype == np.float32:

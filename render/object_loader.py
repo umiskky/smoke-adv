@@ -2,20 +2,18 @@ import os
 import os.path as osp
 
 import torch
-import torch.nn as nn
 from pytorch3d.io import load_objs_as_meshes
 from pytorch3d.transforms import Transform3d, Scale, RotateAxisAngle, Translate
 
 
-class ObjectLoader(nn.Module):
+class ObjectLoader:
     def __init__(self, args: dict) -> None:
-        super().__init__()
         self._device = args["device"]
         self._mesh = self.load(obj_path=osp.join(os.getenv("project_path"),
                                                  args["obj_path"]),
                                device=self._device)
-        self._verts: torch.Tensor = getattr(self._mesh, "_verts_list")[0]
-        self._textures: torch.Tensor = getattr(self._mesh.textures, "_maps_padded")
+        self._verts: torch.Tensor = getattr(self._mesh, "_verts_list")[0].clone()
+        self._textures: torch.Tensor = getattr(self._mesh.textures, "_maps_padded").clone()
 
     def forward(self, data: list):
         """
@@ -43,8 +41,15 @@ class ObjectLoader(nn.Module):
     @staticmethod
     def apply_model_matrix(mesh, model_matrix, verts):
         # Apply transform to mesh
-        verts_list = getattr(mesh, "_verts_list")
-        verts_list[0][:] = model_matrix.transform_points(verts)
+        # verts_list = getattr(mesh, "_verts_list")[0]
+        # verts_list[0][:] = model_matrix.transform_points(verts)
+        setattr(mesh, "_verts_list", [model_matrix.transform_points(verts)])
+        # Reset All Caches
+        setattr(mesh, "_verts_normals_packed", None)
+        setattr(mesh, "_verts_packed", None)
+        setattr(mesh, "_verts_packed_to_mesh_idx", None)
+        setattr(mesh, "_verts_padded", None)
+        setattr(mesh, "_verts_padded_to_packed_idx", None)
 
     @staticmethod
     def get_model_matrix(rotation: tuple = None, translate: tuple = None, scale_rate=0.01, device="cpu"):

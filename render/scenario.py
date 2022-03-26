@@ -1,13 +1,12 @@
+import copy
 import os
 import os.path as osp
-import copy
+
 import cv2
-import torch.nn as nn
 
 
-class Scenario(nn.Module):
+class Scenario:
     def __init__(self, args: dict, scenario_indexes: list):
-        super().__init__()
         self._project_path = os.getenv("project_path")
         # dict of HWC -> RGB -> 0~255 np.ndarray
         # HW list

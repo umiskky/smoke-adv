@@ -49,13 +49,21 @@ class Dataset(tud.Dataset):
                 indexes.append(str(scenario_idx))
                 K = getKMatrix(calib_idx=scenario_idx,
                                calib_path=calib_path)
-                model_matrix_scale = dic[scenario_idx]["model_matrix"].get("scale")
-                model_matrix_rotation = dic[scenario_idx]["model_matrix"].get("rotation")
-                model_matrix_translate = dic[scenario_idx]["model_matrix"].get("translate")
-                light_ambient_color = dic[scenario_idx]["light"].get("ambient_color")
-                light_diffuse_color = dic[scenario_idx]["light"].get("diffuse_color")
-                light_specular_color = dic[scenario_idx]["light"].get("specular_color")
-                light_location = dic[scenario_idx]["light"].get("location")
+                if dic[scenario_idx] is not None and dic[scenario_idx]["model_matrix"] is not None:
+                    model_matrix_scale = dic[scenario_idx]["model_matrix"].get("scale")
+                    model_matrix_rotation = dic[scenario_idx]["model_matrix"].get("rotation")
+                    model_matrix_translate = dic[scenario_idx]["model_matrix"].get("translate")
+                else:
+                    model_matrix_scale = 0
+                    model_matrix_rotation = [0, 0, 0]
+                    model_matrix_translate = [[0, 0, 0]]
+                if dic[scenario_idx] is not None and dic[scenario_idx]["light"] is not None:
+                    light_ambient_color = dic[scenario_idx]["light"].get("ambient_color")
+                    light_diffuse_color = dic[scenario_idx]["light"].get("diffuse_color")
+                    light_specular_color = dic[scenario_idx]["light"].get("specular_color")
+                    light_location = dic[scenario_idx]["light"].get("location")
+                else:
+                    light_ambient_color = light_diffuse_color = light_specular_color = light_location = [0, 0, 0]
 
                 item_num = len(model_matrix_translate)
                 # ============================ check valid or not ============================

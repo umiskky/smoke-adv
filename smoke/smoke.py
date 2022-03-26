@@ -3,14 +3,12 @@ import os.path as osp
 
 import numpy as np
 import torch
-import torch.nn as nn
 from torchvision.transforms import transforms
 
 
-class Smoke(nn.Module):
+class Smoke:
 
     def __init__(self, args: dict) -> None:
-        super().__init__()
         self._device = args["device"]
         assert "cuda:0" == self._device
         self._transform_params = args["transform"]
@@ -46,14 +44,18 @@ class Smoke(nn.Module):
                 vis_box3d_branch = box3d_branch.detach().clone().cpu()
             else:
                 vis_box3d_branch = box3d_branch.clone().cpu()
-            if scenario_input.requires_grad:
-                vis_scenario_input = scenario_input.detach().clone().cpu()
+            if isinstance(scenario, torch.Tensor):
+                if scenario.requires_grad:
+                    vis_scenario = scenario.detach().clone().cpu().numpy().astype(np.uint8)
+                else:
+                    vis_scenario = scenario.clone().cpu().numpy().astype(np.uint8)
             else:
-                vis_scenario_input = scenario_input.clone().cpu()
+                vis_scenario = scenario
             self.visualization["detection"] = vis_box3d_branch
             self.visualization["K"] = self.getIntrinsicMatrix(K=data[1], is_inverse=False, device="cpu")
             self.visualization["scenario_size"] = scenario_size
-            self.visualization["scenario"] = vis_scenario_input.squeeze().permute(1, 2, 0).numpy()
+            # np.ndarray HWC int8
+            self.visualization["scenario"] = vis_scenario
         # =============================================================================================
         return box3d_branch, feat_branch
 
@@ -64,6 +66,7 @@ class Smoke(nn.Module):
         elif isinstance(scenario, torch.Tensor):
             scenario_input = scenario
         assert scenario_input is not None
+        scenario_size = scenario_input.shape[0:2]
         # CHW
         scenario_input = scenario_input.permute((2, 0, 1))
         transform = transforms.Compose([
@@ -73,7 +76,7 @@ class Smoke(nn.Module):
         scenario_input_ = transform(scenario_input)
         # BCHW
         scenario_input_ = scenario_input_.unsqueeze(0).float()
-        return scenario_input_, scenario_input_.shape[2: 4]
+        return scenario_input_, scenario_size
 
     @staticmethod
     def getIntrinsicMatrix(K: np.ndarray, is_inverse=True, device="cpu"):

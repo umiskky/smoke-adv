@@ -1,12 +1,11 @@
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from pytorch3d.renderer import look_at_view_transform, PerspectiveCameras, AmbientLights, RasterizationSettings, \
     BlendParams, MeshRenderer, MeshRasterizer, PointLights, SoftPhongShader
 
 
-class Renderer(nn.Module):
+class Renderer:
     def __init__(self, args: dict) -> None:
         super().__init__()
         self._device = args["device"]
@@ -26,7 +25,9 @@ class Renderer(nn.Module):
         self.visualization = {}
 
     def forward(self, mesh, scenario, data: list):
-        """data = [scenario_idx, K, scale, rotation, translate, ambient_color, diffuse_color, specular_color, location]"""
+        """data
+        [scenario_idx, K, scale, rotation, translate, ambient_color, diffuse_color, specular_color, location]
+        """
 
         # Init
         render_in_scenario = render_in_bg = None
@@ -181,11 +182,11 @@ class Renderer(nn.Module):
                 mesh_in_back_copy = render_in_bg.clone().cpu()
             # merge rgb value
             mesh_in_back_copy_sum_c = mesh_in_back_copy.sum(dim=2)
-            index = torch.nonzero(mesh_in_back_copy_sum_c - np.array(background_color).sum())
-            y_min = index[0][0]
-            x_min = index[0][1]
-            y_max = index[-1][0]
-            x_max = index[-1][1]
+            index = torch.nonzero(mesh_in_back_copy_sum_c - np.array(background_color).sum()).T
+            y_min = index[0].min()
+            x_min = index[1].min()
+            y_max = index[0].max()
+            x_max = index[1].max()
         return [x_min, y_min, x_max, y_max]
 
     @staticmethod

@@ -1,17 +1,15 @@
 import os
+import os.path as osp
 
+import cv2
 import numpy as np
 import torch
-import torch.nn as nn
-import os.path as osp
-import cv2
 
 from tools.color_utils import RgbToHls, HlsToRgb
 
 
-class TextureSticker(nn.Module):
+class TextureSticker:
     def __init__(self, args: dict, textures: torch.Tensor) -> None:
-        super().__init__()
         self._device = args["device"]
         self._texture_hls = self._textures_rgb_to_hls(textures)
         self._sticker_type = args["type"]

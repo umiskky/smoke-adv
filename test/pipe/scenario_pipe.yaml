@@ -1,0 +1,24 @@
+base: "data/config/base.yaml"
+
+global:
+  project_path: "/home/dingxl/workspace/smoke-adv/"
+  device: "cuda:0"
+
+dataset:
+  meta: "test/pipe/meta.yaml"
+
+enable:
+  object: false
+  stickers: false
+  scenario: true
+  renderer: false
+  smoke: false
+  attack: false
+  logger: true
+
+logger:
+  local:
+    vis_plt: true
+    plt_content: ["scenario"]
+
+

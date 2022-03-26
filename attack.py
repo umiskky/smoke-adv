@@ -32,7 +32,7 @@ def main(args):
     logger.broadcast_logger(cfg.cfg_all, exclude=[])
     pipeline = Pipeline(cfg)
 
-    es = EarlyStop(max_step=60)
+    es = EarlyStop(max_step=40)
     train_flag = True
     epoch = 0
     step = 0
@@ -43,14 +43,13 @@ def main(args):
                        clip_max=cfg.cfg_attack["optimizer"]["clip_max"],
                        position=cfg.cfg_stickers["position"],
                        size=cfg.cfg_stickers["size"])
-    # dataloader = DataLoader(dataset=pipeline.dataset)
+    # dataloader = DataLoader(dataset=pipe.dataset)
     while train_flag:
         _epoch_loss = 0
         for _, data in enumerate(pipeline.dataset.data):
             try:
-                with time_block("Forward"):
+                with time_block("Forward & Backward & Step"):
                     loss = pipeline.forward(data)
-                with time_block("Backward & Step"):
                     loss.backward()
                     pgd.record()
             except KeyboardInterrupt:
@@ -70,7 +69,7 @@ def main(args):
                                                stickers=pipeline.stickers,
                                                smoke=pipeline.smoke)
                 # print to terminal
-                print("epoch: %04d" % epoch + "   " + "step: %04d" % step + "   " + "step_loss: %.5f" % _step_loss)
+                print("epoch: %04d" % epoch + "   " + "step: %04d" % step + "   " + "step_loss: %.10f" % _step_loss)
                 # log
                 logger.logger_comet.log_metric("loss_step", _step_loss, step=step)
                 # clear and prepare for the next step
@@ -80,9 +79,10 @@ def main(args):
         # print to terminal
         print("==============================================================")
         print("epoch: %04d" % epoch +
-              "   epoch_loss: %.5f" % _epoch_loss +
-              "   mean_loss: %.5f" % (_epoch_loss/len(pipeline.dataset.data)))
-        print("==============================================================")
+              "   epoch_loss: %.10f" % _epoch_loss +
+              "   mean_loss: %.10f" % (_epoch_loss/len(pipeline.dataset.data)))
+        print("==============================================================\n")
+
         # log
         logger.logger_comet.log_metric("loss_epoch", _epoch_loss, step=epoch)
         logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(pipeline.dataset.data), step=epoch)

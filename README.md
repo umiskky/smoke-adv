@@ -78,27 +78,66 @@
   - scenario: vis scenario
 
     - ```yaml
+      enable:
+        object: false
+        stickers: false
+        scenario: true
+        renderer: false
+        smoke: false
+        attack: false
+        logger: true
 
   - scenario detection: the detection outcomes of scenario without any renderer
 
     - ```yaml
+      enable:
+        object: false
+        stickers: false
+        scenario: true
+        renderer: false
+        smoke: true
+        attack: false
+        logger: true
 
   - renderer: vis render outcomes
-
+  
     - ```yaml
-
-  - renderer detection: the detection outcomes of render in background outcomes
-
-    - ```yaml
+      enable:
+        object: true
+        stickers: false
+        scenario: true
+        renderer: true
+        smoke: false
+        attack: false
+        logger: true
 
   - renderer in scenario detection: the detection outcomes of render in scenario outcomes
-
+  
     - ```yaml
-      
+      enable:
+        object: true
+        stickers: false
+        scenario: true
+        renderer: true
+        smoke: true
+        attack: false
+        logger: true
       ```
-
+  
+  - render with stickers in scenario detection:
+  
+    - ```yaml
+      enable:
+        object: true
+        stickers: true
+        scenario: true
+        renderer: true
+        smoke: true
+        attack: false
+        logger: true
+  
   - attack: whole attack pipeline
-
+  
     - ```yaml
       enable:
         object: true
@@ -108,7 +147,7 @@
         smoke: true
         attack: true
         logger: true
-
+  
   - defense: whole defense pipeline
-
+  
     - ```yaml

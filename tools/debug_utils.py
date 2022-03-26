@@ -1,6 +1,9 @@
+import os
 import time
 from functools import wraps
 from contextlib import contextmanager
+
+DEBUG = bool(os.getenv("debug"))
 
 
 def time_func(func):
@@ -17,12 +20,18 @@ def time_func(func):
 
 @contextmanager
 def time_block(label):
-    start = time.perf_counter()
-    try:
-        yield
-    finally:
-        end = time.perf_counter()
-        print('{} : {:.3f}'.format(label, end - start))
+    if DEBUG:
+        start = time.perf_counter()
+        try:
+            yield
+        finally:
+            end = time.perf_counter()
+            print('{} : {:.3f}'.format(label, end - start))
+    else:
+        try:
+            yield
+        finally:
+            pass
 
 
 class Timer:

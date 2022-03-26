@@ -38,7 +38,8 @@ class Visualization:
         # enable for figure plot only once
         self._once = True
 
-    def vis(self, scenario_index, epoch, step, scenario: Scenario, renderer: Renderer, stickers: TextureSticker, smoke: Smoke):
+    def vis(self, scenario_index, epoch, step, scenario: Scenario, renderer: Renderer, stickers: TextureSticker,
+            smoke: Smoke):
         """
         Vis For Pipeline.\n
         :param scenario_index: scenario index.
@@ -134,44 +135,48 @@ class Visualization:
                         step=self._epoch)
 
     def _vis_detection(self, smoke: Smoke, scenario_index):
-        obstacle_list = Obstacle.decode(box3d_branch_data=smoke.visualization.get("detection"),
-                                        k=smoke.visualization.get("K"),
-                                        confidence_score=self._confidence_threshold,
-                                        ori_img_size=smoke.visualization.get("scenario_size"))
+        if self._enable_vis_plt and ("detection_3d" in self._plt_content or "detection_2d" in self._plt_content) \
+                or self._enable_vis_offline and (
+                "detection_3d" in self._off_content or "detection_2d" in self._off_content) \
+                or self._enable_comet and (
+                "detection_3d" in self._comet_content or "detection_2d" in self._comet_content):
+            obstacle_list = Obstacle.decode(box3d_branch_data=smoke.visualization.get("detection"),
+                                            k=smoke.visualization.get("K"),
+                                            confidence_score=self._confidence_threshold,
+                                            ori_img_size=smoke.visualization.get("scenario_size"))
+            if smoke is not None and len(smoke.visualization) > 0:
+                # 0~255 RGB HWC uint8
+                detection_3d_plot = draw_3d_boxes(smoke.visualization.get("scenario"), obstacle_list)
+                # 0~255 RGB HWC uint8
+                detection_2d_plot = draw_2d_boxes(smoke.visualization.get("scenario"), obstacle_list)
 
-        if smoke is not None and len(smoke.visualization) > 0:
-            # 0~255 RGB HWC uint8
-            detection_3d_plot = draw_3d_boxes(smoke.visualization.get("scenario"), obstacle_list)
-            # 0~255 RGB HWC uint8
-            detection_2d_plot = draw_2d_boxes(smoke.visualization.get("scenario"), obstacle_list)
+                epoch_step = "%04d-epoch_%04d-step" % (self._epoch, self._step)
 
-            epoch_step = "%04d-epoch_%04d-step" % (self._epoch, self._step)
-
-            if self._enable_vis_plt:
-                if "detection_3d" in self._plt_content:
-                    plot_img(detection_3d_plot, "detection_3d_" + epoch_step)
-                if "detection_2d" in self._plt_content:
-                    plot_img(detection_2d_plot, "detection_2d_" + epoch_step)
-            if self._enable_vis_offline:
-                if "detection_3d" in self._off_content:
-                    saving_path = osp.join(self._offline_dir, "detection_3d",
-                                           scenario_index + "_" + epoch_step + "_detection_3d.png")
-                    save_img(detection_3d_plot, saving_path)
-                if "detection_2d" in self._off_content:
-                    saving_path = osp.join(self._offline_dir, "detection_2d",
-                                           scenario_index + "_" + epoch_step + "_detection_2d.png")
-                    save_img(detection_2d_plot, saving_path)
-            if self._enable_comet:
-                if "detection_3d" in self._comet_content:
-                    log_img(logger=self._logger_comet,
-                            image=detection_3d_plot,
-                            img_name=scenario_index + "_" + epoch_step + "_detection_3d",
-                            step=self._epoch)
-                if "detection_2d" in self._comet_content:
-                    log_img(logger=self._logger_comet,
-                            image=detection_2d_plot,
-                            img_name=scenario_index + "_" + epoch_step + "_detection_2d",
-                            step=self._epoch)
+                if self._enable_vis_plt:
+                    if "detection_3d" in self._plt_content:
+                        plot_img(detection_3d_plot, "detection_3d_" + epoch_step)
+                    if "detection_2d" in self._plt_content:
+                        plot_img(detection_2d_plot, "detection_2d_" + epoch_step)
+                if self._enable_vis_offline:
+                    if "detection_3d" in self._off_content:
+                        saving_path = osp.join(self._offline_dir, "detection_3d",
+                                               scenario_index + "_" + epoch_step + "_detection_3d.png")
+                        save_img(detection_3d_plot, saving_path)
+                    if "detection_2d" in self._off_content:
+                        saving_path = osp.join(self._offline_dir, "detection_2d",
+                                               scenario_index + "_" + epoch_step + "_detection_2d.png")
+                        save_img(detection_2d_plot, saving_path)
+                if self._enable_comet:
+                    if "detection_3d" in self._comet_content:
+                        log_img(logger=self._logger_comet,
+                                image=detection_3d_plot,
+                                img_name=scenario_index + "_" + epoch_step + "_detection_3d",
+                                step=self._epoch)
+                    if "detection_2d" in self._comet_content:
+                        log_img(logger=self._logger_comet,
+                                image=detection_2d_plot,
+                                img_name=scenario_index + "_" + epoch_step + "_detection_2d",
+                                step=self._epoch)
 
     def save_patch(self, epoch, loss_epoch, stickers: TextureSticker):
         if stickers.patch.requires_grad:
