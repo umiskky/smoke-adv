@@ -26,6 +26,9 @@ class Logger:
         if args["logging"]["enable"]:
             self._init_logger_console(args)
 
+        if self._logger_comet is not None:
+            self._logger_comet.set_name(self._timestamp)
+
     def _init_logger_online(self, args: dict):
         args = args["comet"]
         self._logger_comet = Experiment(

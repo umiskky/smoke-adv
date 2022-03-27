@@ -67,7 +67,7 @@ class Loss:
                 box_2d = box_2d.cpu()
             iou = tvo.box_iou(box_2d_gt, box_2d).squeeze()
             index_select = torch.nonzero(iou >= iou_threshold)
-        return box3d_branch[index_select, -1].sum() * -1
+        return torch.max(box3d_branch[index_select, -1]) * -1
 
     def get_3d_gt_iou_loss(self):
         pass

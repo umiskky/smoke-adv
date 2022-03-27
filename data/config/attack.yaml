@@ -23,19 +23,22 @@ stickers:
 attack:
   loss:
     threshold: -1
-    iou: 0.05
+    iou: 0.1
   optimizer:
-    alpha: 0.0005
-    clip_min: -0.01
-    clip_max: 0.01
+    alpha: 0.001
+    clip_min: -0.04
+    clip_max: 0.04
 
 logger:
   common:
-      confidence_threshold: 0.15
+      confidence_threshold: 0.1
   comet:
     enable: true
-    test: true
-#  local:
+    test: false
+    vis_content: ["detection_2d", "detection_3d"]
+  local:
+    vis_offline: true
+    off_content: ["patch"]
 #    vis_plt: true
 ##    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
 #    plt_content: ["render_scenario"]

@@ -1,12 +1,13 @@
 import argparse
-
+import os
+import os.path as osp
 import torch
-from torch.utils.data import DataLoader
+from matplotlib import pyplot as plt
 
-from pipeline.pipeline import Pipeline
-from pipeline.modules.pgd_optimizer import PGDOptimizer
-from tools.config import Config
 from pipeline.modules.early_stop import EarlyStop
+from pipeline.modules.pgd_optimizer import PGDOptimizer
+from pipeline.pipeline import Pipeline
+from tools.config import Config
 from tools.debug_utils import time_block
 from tools.logger import Logger
 
@@ -30,6 +31,12 @@ def main(args):
     cfg = Config(args.cfg)
     logger = Logger(cfg.cfg_logger)
     logger.broadcast_logger(cfg.cfg_all, exclude=[])
+    logger.logger_comet.log_parameters(logger.encode_config_for_log(cfg.cfg_for_log))
+    workdir = os.getenv("project_path")
+    # log meta.yaml & attack.yaml
+    logger.logger_comet.log_asset(osp.join(workdir, cfg.cfg_dataset["meta"]))
+    logger.logger_comet.log_asset(osp.join(workdir, "data/config/attack.yaml"))
+
     pipeline = Pipeline(cfg)
 
     es = EarlyStop(max_step=40)
@@ -59,7 +66,7 @@ def main(args):
             with torch.no_grad():
                 _step_loss = loss.clone().cpu().item() * -1
                 _epoch_loss += _step_loss
-                # Visualization Pipeline
+                # # Visualization Pipeline
                 with time_block("Vis"):
                     pipeline.visualization.vis(scenario_index=data[0],
                                                epoch=epoch,
@@ -84,15 +91,21 @@ def main(args):
         print("==============================================================\n")
 
         # log
-        logger.logger_comet.log_metric("loss_epoch", _epoch_loss, step=epoch)
-        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(pipeline.dataset.data), step=epoch)
-        # save patch
-        pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+        logger.logger_comet.log_metric("loss_epoch", _epoch_loss, epoch=epoch)
+        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(pipeline.dataset.data), epoch=epoch)
+        # # save patch
+        # pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
         # check if you can stop training
         if _epoch_loss <= cfg.cfg_attack["target_score"]:
             train_flag = False
         else:
             train_flag = es.step(_epoch_loss)
+
+        # save patch before exit
+        if not train_flag:
+            # save patch
+            pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+
         # clear and prepare for the next epoch
         _epoch_loss = 0
         epoch += 1
