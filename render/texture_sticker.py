@@ -52,6 +52,7 @@ class TextureSticker:
                     vis_texture = vis_texture.clone().cpu()
                 # 0~1.0 RGB HWC
                 self.visualization["texture"] = vis_texture.squeeze().numpy()
+                self.visualization["texture_perturb"] = vis_texture.squeeze()
         # =============================================================================================
         return mesh
 

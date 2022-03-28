@@ -111,4 +111,6 @@ logger:
     vis_offline: false
     # Support types: texture, scenario, render_bg, render_scenario, detection_3d, detection_2d, patch(save).
     off_content: ["detection_2d", "detection_3d", "scenario"]
+    # Save patch each patch_save_frequency
+    patch_save_frequency: 10
   # ================================================

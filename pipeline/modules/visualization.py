@@ -1,6 +1,9 @@
 import os
 import os.path as osp
 
+import torch
+
+from render.object_loader import ObjectLoader
 from render.renderer import Renderer
 from render.scenario import Scenario
 from render.texture_sticker import TextureSticker
@@ -28,6 +31,7 @@ class Visualization:
         self._enable_vis_offline = args["local"]["vis_offline"]
         self._offline_dir = osp.join(self._project_path, "data/results", self._timestamp, "visualization")
         self._off_content = args["local"]["off_content"]
+        self._patch_save_frequency = args["local"]["patch_save_frequency"]
 
         if self._enable_vis_offline:
             makedirs(self._offline_dir)
@@ -178,16 +182,66 @@ class Visualization:
                                 img_name=scenario_index + "_" + epoch_step + "_detection_2d",
                                 step=self._epoch)
 
-    def save_patch(self, epoch, loss_epoch, stickers: TextureSticker):
-        if stickers.patch.requires_grad:
-            save_patch = stickers.patch.detach().clone().cpu()
-        else:
-            save_patch = stickers.patch.clone().cpu()
-        # save texture patch
-        if self._enable_vis_offline and "patch" in self._off_content:
-            state_dict = {"patch": save_patch, "epoch": epoch, "loss": loss_epoch}
-            state_saving(state=state_dict, epoch=epoch, loss=loss_epoch, path=self._offline_dir)
+    def eval_norm(self, epoch, object_loader: ObjectLoader, stickers: TextureSticker):
+        """Evaluate the norm of perturbation"""
+        metrics = {}
+        # 0~1.0 RGB HWC float32
+        texture_raw = object_loader.textures.clone().squeeze().cpu()
+        # 0~1.0 RGB HWC float32
+        texture_perturb = stickers.visualization.get("texture_perturb")
+        if texture_perturb is not None:
+            texture_perturb = texture_perturb.cpu()
+            # 0~1.0 RGB HWC -> CHW float32
+            d_texture = (texture_perturb - texture_raw).permute(2, 0, 1)
 
-    def _init_dir(self, contents: list):
+            # L1 norm
+            l1_norm = torch.norm(d_texture, p=1, dim=[1, 2])
+            r_l1_norm, g_l1_norm, b_l1_norm = \
+                torch.split(l1_norm, split_size_or_sections=1, dim=0)
+            rgb_l1_norm = torch.norm(d_texture, p=1)
+            metrics["r_l1_norm"] = r_l1_norm
+            metrics["g_l1_norm"] = g_l1_norm
+            metrics["b_l1_norm"] = b_l1_norm
+            metrics["rgb_l1_norm"] = rgb_l1_norm
+
+            # frobenius norm
+            frobenius_norm = torch.norm(d_texture, p='fro', dim=[1, 2])
+            r_frobenius_norm, g_frobenius_norm, b_frobenius_norm = \
+                torch.split(frobenius_norm, split_size_or_sections=1, dim=0)
+            rgb_frobenius_norm = torch.norm(d_texture, p='fro')
+            metrics["r_frobenius_norm"] = r_frobenius_norm
+            metrics["g_frobenius_norm"] = g_frobenius_norm
+            metrics["b_frobenius_norm"] = b_frobenius_norm
+            metrics["rgb_frobenius_norm"] = rgb_frobenius_norm
+
+            # inf norm
+            inf_norm = torch.norm(d_texture, p=float('inf'), dim=[1, 2])
+            r_inf_norm, g_inf_norm, b_inf_norm = \
+                torch.split(inf_norm, split_size_or_sections=1, dim=0)
+            rgb_inf_norm = torch.norm(d_texture, p=float('inf'))
+            metrics["r_inf_norm"] = r_inf_norm
+            metrics["g_inf_norm"] = g_inf_norm
+            metrics["b_inf_norm"] = b_inf_norm
+            metrics["rgb_inf_norm"] = rgb_inf_norm
+
+            self._logger_comet.log_metrics(metrics, epoch=epoch)
+
+    def save_patch(self, epoch, loss_epoch, stickers: TextureSticker):
+        """Save Patch At a certain frequency"""
+        frequency = self._patch_save_frequency
+        if epoch % frequency == 0:
+            if stickers.patch.requires_grad:
+                save_patch = stickers.patch.detach().clone().cpu()
+            else:
+                save_patch = stickers.patch.clone().cpu()
+            # save texture patch
+            if self._enable_vis_offline and "patch" in self._off_content:
+                state_dict = {"patch": save_patch, "epoch": epoch, "loss": loss_epoch}
+                state_saving(state=state_dict, epoch=epoch, loss=loss_epoch, path=self._offline_dir)
+
+    def _init_dir(self, contents: list, exclude=None):
+        if exclude is None:
+            exclude = [""]
         for content in contents:
-            makedirs(self._offline_dir, content)
+            if content not in exclude:
+                makedirs(self._offline_dir, content)

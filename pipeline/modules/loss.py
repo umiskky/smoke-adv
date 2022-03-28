@@ -16,20 +16,23 @@ class Loss:
         self.target = self.target_map[args["target"]]
 
     def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor, K=None, scenario_size=None):
+        res = None
         box3d_branch_score_filtered = self.filter_with_threshold(box3d_branch, self.threshold)
         box3d_branch_target_filtered = self.filter_with_target(box3d_branch_score_filtered, self.target)
+        if box3d_branch_target_filtered.shape[0] == 0:
+            return None
         if "class" == self.type:
-            return self.get_class_loss(box3d_branch_target_filtered)
+            res = self.get_class_loss(box3d_branch_target_filtered)
         if "2d_iou" == self.type:
             assert self.iou >= 0
             box_2d = box3d_branch_target_filtered.detach().clone() \
                 if box3d_branch_target_filtered.requires_grad \
                 else box3d_branch_target_filtered.clone()
             box_2d = box_2d[:, 2:6]
-            return self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
-                                           iou_threshold=self.iou,
-                                           box_2d_gt=box_pseudo_gt["2d"],
-                                           box_2d=box_2d)
+            res = self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
+                                          iou_threshold=self.iou,
+                                          box_2d_gt=box_pseudo_gt["2d"],
+                                          box_2d=box_2d)
         # Get 2D Box from 3D Box
         if "2d_iou_fake" == self.type and K is not None:
             assert self.iou >= 0
@@ -40,11 +43,11 @@ class Loss:
             _, box_2d = self.decode_boxes(box3d_branch=box3d_branch_target_filtered,
                                           K=K,
                                           ori_img_size=scenario_size)
-            return self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
-                                           iou_threshold=self.iou,
-                                           box_2d_gt=box_pseudo_gt["2d"],
-                                           box_2d=box_2d)
-        return torch.tensor(0.0, device=self.device)
+            res = self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
+                                          iou_threshold=self.iou,
+                                          box_2d_gt=box_pseudo_gt["2d"],
+                                          box_2d=box_2d)
+        return res
 
     @staticmethod
     def get_class_loss(box3d_branch: torch.Tensor):
@@ -53,11 +56,15 @@ class Loss:
         :param box3d_branch: smoke output branch.
         :return: torch.Tensor.
         """
+        if box3d_branch.shape[0] == 0:
+            return None
         loss = box3d_branch[:, -1].sum() * -1
         return loss
 
     @staticmethod
     def get_2d_gt_iou_loss(box3d_branch: torch.Tensor, iou_threshold: float, box_2d_gt, box_2d):
+        if box3d_branch.shape[0] == 0:
+            return None
         # Calculate Indexes
         with torch.no_grad():
             if isinstance(box_2d_gt, list):
@@ -67,15 +74,19 @@ class Loss:
                 box_2d = box_2d.cpu()
             iou = tvo.box_iou(box_2d_gt, box_2d).squeeze()
             index_select = torch.nonzero(iou >= iou_threshold)
-        return torch.max(box3d_branch[index_select, -1]) * -1
+        if index_select.shape[0] > 0:
+            return torch.max(box3d_branch[index_select, -1]) * -1
+        else:
+            return None
 
     def get_3d_gt_iou_loss(self):
+
         pass
 
     @staticmethod
     def filter_with_threshold(box3d_branch: torch.Tensor, threshold: float):
         """filter box3d_branch with score threshold"""
-        if threshold >= 0:
+        if threshold >= 0 and box3d_branch.shape[0] > 0:
             keep_idx = torch.nonzero(box3d_branch[:, -1] > threshold).squeeze()
             box3d_branch_ = box3d_branch.index_select(0, keep_idx)
             return box3d_branch_
@@ -92,6 +103,8 @@ class Loss:
     @staticmethod
     def decode_boxes(box3d_branch: torch.Tensor, K: torch.Tensor, ori_img_size) -> (torch.Tensor, torch.Tensor):
         """decode 3D Box to get 2D Box"""
+        if box3d_branch.shape[0] == 0:
+            return None
         with torch.no_grad():
             if box3d_branch.requires_grad:
                 box3d_branch_copy = box3d_branch.detach().clone().cpu()

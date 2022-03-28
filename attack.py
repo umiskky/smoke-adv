@@ -1,8 +1,8 @@
 import argparse
 import os
 import os.path as osp
+
 import torch
-from matplotlib import pyplot as plt
 
 from pipeline.modules.early_stop import EarlyStop
 from pipeline.modules.pgd_optimizer import PGDOptimizer
@@ -57,13 +57,16 @@ def main(args):
             try:
                 with time_block("Forward & Backward & Step"):
                     loss = pipeline.forward(data)
-                    loss.backward()
-                    pgd.record()
+                    if loss is not None:
+                        loss.backward()
+                        pgd.record()
             except KeyboardInterrupt:
                 print("Stop Attack Manually!")
                 logger.close_logger()
 
             with torch.no_grad():
+                if loss is None:
+                    loss = torch.tensor(0)
                 _step_loss = loss.clone().cpu().item() * -1
                 _epoch_loss += _step_loss
                 # # Visualization Pipeline
@@ -93,8 +96,10 @@ def main(args):
         # log
         logger.logger_comet.log_metric("loss_epoch", _epoch_loss, epoch=epoch)
         logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(pipeline.dataset.data), epoch=epoch)
-        # # save patch
-        # pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+        # save patch
+        pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+        # eval perturbation norm
+        pipeline.visualization.eval_norm(epoch, pipeline.object_loader, pipeline.stickers)
         # check if you can stop training
         if _epoch_loss <= cfg.cfg_attack["target_score"]:
             train_flag = False

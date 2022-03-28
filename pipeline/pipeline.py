@@ -2,13 +2,13 @@ import torch.nn as nn
 
 from pipeline.modules.dataset import Dataset
 from pipeline.modules.loss import Loss
+from pipeline.modules.visualization import Visualization
 from render.object_loader import ObjectLoader
 from render.renderer import Renderer
 from render.scenario import Scenario
 from render.texture_sticker import TextureSticker
 from smoke.smoke import Smoke
 from tools.config import Config
-from pipeline.modules.visualization import Visualization
 
 
 class Pipeline(nn.Module):
@@ -107,9 +107,10 @@ class Pipeline(nn.Module):
                                          box3d_branch=box3d_branch,
                                          K=data[1],
                                          scenario_size=scenario_size)
+                return loss
 
         # Result Setting
-        result_list = [loss, box3d_branch, synthesis_img, scenario]
+        result_list = [box3d_branch, synthesis_img, scenario]
         for result in result_list:
             if result is not None:
                 return result

@@ -21,13 +21,14 @@ stickers:
   position: [ 0, 0 ]
 
 attack:
+  target_score: 0.05
   loss:
     threshold: -1
     iou: 0.1
   optimizer:
-    alpha: 0.001
-    clip_min: -0.04
-    clip_max: 0.04
+    alpha: 0.01
+    clip_min: -0.1
+    clip_max: 0.1
 
 logger:
   common:
@@ -35,10 +36,11 @@ logger:
   comet:
     enable: true
     test: false
-    vis_content: ["detection_2d", "detection_3d"]
+    vis_content: ["detection_2d"]
   local:
     vis_offline: true
-    off_content: ["patch"]
+    off_content: ["patch", "detection_2d", "detection_3d"]
+    patch_save_frequency: 10
 #    vis_plt: true
 ##    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
 #    plt_content: ["render_scenario"]

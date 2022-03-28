@@ -25,7 +25,7 @@ def makedirs(base: str, *target):
 
 
 def state_saving(state: dict, epoch: int, loss: float,  path: str):
-    saving_path = osp.join(path, "texture")
+    saving_path = osp.join(path, "patch")
     makedirs(saving_path)
     file_name = "%05d" % epoch + "_" + ("%.5f" % abs(loss)).zfill(9) + "_patch.pth"
     torch.save(state, osp.join(saving_path, file_name))
