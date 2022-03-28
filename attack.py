@@ -43,14 +43,16 @@ def main(args):
     train_flag = True
     epoch = 0
     step = 0
+    step_loss_list = []
 
     pgd = PGDOptimizer(params=[pipeline.stickers.patch],
                        alpha=cfg.cfg_attack["optimizer"]["alpha"],
                        clip_min=cfg.cfg_attack["optimizer"]["clip_min"],
                        clip_max=cfg.cfg_attack["optimizer"]["clip_max"],
                        position=cfg.cfg_stickers["position"],
-                       size=cfg.cfg_stickers["size"])
-    # dataloader = DataLoader(dataset=pipe.dataset)
+                       size=cfg.cfg_stickers["size"],
+                       device=cfg.cfg_global["device"])
+
     while train_flag:
         _epoch_loss = 0
         for _, data in enumerate(pipeline.dataset.data):
@@ -59,16 +61,17 @@ def main(args):
                     loss = pipeline.forward(data)
                     if loss is not None:
                         loss.backward()
-                        pgd.record()
+                    pgd.record()
             except KeyboardInterrupt:
                 print("Stop Attack Manually!")
                 logger.close_logger()
 
             with torch.no_grad():
                 if loss is None:
-                    loss = torch.tensor(0)
+                    loss = torch.tensor(0.0)
                 _step_loss = loss.clone().cpu().item() * -1
                 _epoch_loss += _step_loss
+                step_loss_list.append(_step_loss)
                 # # Visualization Pipeline
                 with time_block("Vis"):
                     pipeline.visualization.vis(scenario_index=data[0],
@@ -85,7 +88,7 @@ def main(args):
                 # clear and prepare for the next step
                 step += 1
         # update patch
-        pgd.step()
+        pgd.step(step_type="softmax", step_loss_list=step_loss_list)
         # print to terminal
         print("==============================================================")
         print("epoch: %04d" % epoch +
@@ -113,6 +116,7 @@ def main(args):
 
         # clear and prepare for the next epoch
         _epoch_loss = 0
+        step_loss_list = []
         epoch += 1
 
     # ensure all metrics and code are logged before exiting

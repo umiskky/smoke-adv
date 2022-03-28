@@ -1,6 +1,6 @@
 import argparse
 
-import test.pipe.base_pipe as tpp
+import evaluate.pipe.base_pipe as tpp
 
 
 def parse_args():
