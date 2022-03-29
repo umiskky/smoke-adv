@@ -12,12 +12,27 @@ enable:
   renderer: false
   defense: false
   smoke: false
+  loss: false
   attack: false
   logger: false
 
 dataset:
   meta: "data/config/meta.yaml"
   calib_dir: "data/datasets/waymo/kitti_format/training/calib/"
+  random:
+    # random rotation
+    rotation:
+      enable: false
+      range: [ 0, 360 ]
+      times: 1
+    # random translate
+    translate:
+      enable: false
+      # + ->
+      lateral: [ -0.1, 0.1 ]
+      # + ⊙
+      longitudinal: [ -0.1, 0.1 ]
+
 
 object:
   obj_path: "data/objects/man/man.obj"

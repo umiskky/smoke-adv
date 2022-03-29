@@ -34,6 +34,15 @@ class TextureSticker:
     def patch(self):
         return self._patch
 
+    @patch.setter
+    def patch(self, patch_path):
+        project_path = os.getenv("project_path")
+        fp = osp.join(project_path, patch_path)
+        if osp.exists(fp):
+            state = torch.load(fp)
+            patch = state.get("patch")
+            self._patch = patch.to(self._device)
+
     def forward(self, mesh, enable_patch_grad=False):
         vis_texture = None
         if "hls" == self._sticker_type:

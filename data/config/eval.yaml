@@ -11,21 +11,8 @@ enable:
   renderer: true
   smoke: true
   loss: true
-  attack: true
+  attack: false
   logger: true
-
-dataset:
-  random:
-    # random rotation
-    rotation:
-      enable: true
-      range: [ 0, 360 ]
-      times: 8
-    # random translate
-    translate:
-      enable: true
-      lateral: [ -0.1, 0.1 ]
-      longitudinal: [ -0.1, 0.1 ]
 
 object:
   obj_path: "data/objects/man_1024/man.obj"
@@ -43,24 +30,20 @@ attack:
   loss:
     threshold: -1
     iou: 0.1
-  optimizer:
-    alpha: 0.05
-    clip_min: -0.15
-    clip_max: 0.15
 
 logger:
   common:
-      confidence_threshold: 0.1
+      confidence_threshold: 0.25
   comet:
     enable: true
-    test: false
+    test: true
     vis_content: ["detection_2d"]
   local:
     vis_offline: true
-    off_content: ["patch", "texture", "detection_2d", "detection_3d"]
-    patch_save_frequency: 10
-#    vis_plt: true
-##    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
-#    plt_content: ["render_scenario"]
+#    off_content: ["texture", "detection_2d", "detection_3d"]
+    off_content: ["texture"]
+    patch_save_frequency: 1
+    vis_plt: false
+    plt_content: ["texture", "detection_2d"]
 
 

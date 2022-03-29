@@ -9,13 +9,14 @@ def main_pipe(args):
     logger.broadcast_logger(cfg.cfg_all, exclude=[])
     pipeline = Pipeline(cfg)
 
-    for _, data in enumerate(pipeline.dataset.data):
+    dataset = pipeline.dataset.dataset_generator()
+    pipeline.visualization.step = 0
+    pipeline.visualization.epoch = 0
+    for _, data in enumerate(dataset):
         try:
             pipeline.forward(data)
             # Visualization Pipeline
             pipeline.visualization.vis(scenario_index=data[0],
-                                       epoch=0,
-                                       step=0,
                                        scenario=pipeline.scenario,
                                        renderer=pipeline.renderer,
                                        stickers=pipeline.stickers,

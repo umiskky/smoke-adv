@@ -41,29 +41,47 @@ class Visualization:
         self._epoch = -1
         # enable for figure plot only once
         self._once = True
+        # enable for figure plot every new epoch
+        self._new_epoch = False
 
-    def vis(self, scenario_index, epoch, step, scenario: Scenario, renderer: Renderer, stickers: TextureSticker,
+    @property
+    def epoch(self):
+        return self._epoch
+
+    @epoch.setter
+    def epoch(self, global_epoch):
+        if global_epoch > self._epoch:
+            self._epoch = global_epoch
+            self._new_epoch = True
+
+    @property
+    def step(self):
+        return self._step
+
+    @step.setter
+    def step(self, global_step):
+        if global_step > self._step:
+            self._step = global_step
+
+    def vis(self, scenario_index, scenario: Scenario, renderer: Renderer, stickers: TextureSticker,
             smoke: Smoke):
         """
         Vis For Pipeline.\n
         :param scenario_index: scenario index.
-        :param epoch: epoch.
-        :param step: step.
         :param scenario: instance of Scenario.
         :param renderer: instance of Renderer.
         :param stickers: instance of TextureSticker.
         :param smoke: instance of Smoke.
         :return: None
         """
-        self._step = step
         # Vis only once
         if self._once:
             self._vis_scenario(scenario)
             self._once = False
         # Vis every epoch
-        if self._epoch < epoch:
+        if self._new_epoch:
             self._vis_texture(stickers)
-            self._epoch = epoch
+            self._new_epoch = False
         # Vis every step
         self._vis_render_bg(renderer, scenario_index)
         self._vis_render_scenario(renderer, scenario_index)
@@ -86,20 +104,22 @@ class Visualization:
                             img_name="scenario_%s" % index, step=-1)
 
     def _vis_texture(self, stickers: TextureSticker):
-        if stickers is not None and len(stickers.visualization) > 0:
-            # 0~1.0 RGB HWC float32
-            texture_plot = stickers.visualization.get("texture")
-            if texture_plot is None:
-                return None
-            if self._enable_vis_plt and "texture" in self._plt_content:
-                plot_img(texture_plot, "texture_%04d-epoch" % self._epoch)
-            if self._enable_vis_offline and "texture" in self._off_content:
-                saving_path = osp.join(self._offline_dir, "sticker", "%04d" % self._epoch + "-epoch_texture.png")
-                save_img(texture_plot, saving_path)
-            if self._enable_comet and "texture" in self._comet_content:
-                log_img(logger=self._logger_comet, image=texture_plot,
-                        img_name="%04d" % self._epoch + "-epoch_texture",
-                        step=self._epoch)
+        frequency = self._patch_save_frequency
+        if self._epoch % frequency == 0:
+            if stickers is not None and len(stickers.visualization) > 0:
+                # 0~1.0 RGB HWC float32
+                texture_plot = stickers.visualization.get("texture")
+                if texture_plot is None:
+                    return None
+                if self._enable_vis_plt and "texture" in self._plt_content:
+                    plot_img(texture_plot, "texture_%04d-epoch" % self._epoch)
+                if self._enable_vis_offline and "texture" in self._off_content:
+                    saving_path = osp.join(self._offline_dir, "texture", "%04d" % self._epoch + "-epoch_texture.png")
+                    save_img(texture_plot, saving_path)
+                if self._enable_comet and "texture" in self._comet_content:
+                    log_img(logger=self._logger_comet, image=texture_plot,
+                            img_name="%04d" % self._epoch + "-epoch_texture",
+                            step=self._epoch)
 
     def _vis_render_bg(self, renderer: Renderer, scenario_index):
         if renderer is not None and len(renderer.visualization) > 0:
@@ -182,7 +202,7 @@ class Visualization:
                                 img_name=scenario_index + "_" + epoch_step + "_detection_2d",
                                 step=self._epoch)
 
-    def eval_norm(self, epoch, object_loader: ObjectLoader, stickers: TextureSticker):
+    def eval_norm(self, object_loader: ObjectLoader, stickers: TextureSticker):
         """Evaluate the norm of perturbation"""
         metrics = {}
         # 0~1.0 RGB HWC float32
@@ -224,20 +244,20 @@ class Visualization:
             metrics["b_inf_norm"] = b_inf_norm
             metrics["rgb_inf_norm"] = rgb_inf_norm
 
-            self._logger_comet.log_metrics(metrics, epoch=epoch)
+            self._logger_comet.log_metrics(metrics, epoch=self._epoch)
 
-    def save_patch(self, epoch, loss_epoch, stickers: TextureSticker):
+    def save_patch(self, loss_epoch, stickers: TextureSticker):
         """Save Patch At a certain frequency"""
         frequency = self._patch_save_frequency
-        if epoch % frequency == 0:
+        if self._epoch % frequency == 0:
             if stickers.patch.requires_grad:
                 save_patch = stickers.patch.detach().clone().cpu()
             else:
                 save_patch = stickers.patch.clone().cpu()
             # save texture patch
             if self._enable_vis_offline and "patch" in self._off_content:
-                state_dict = {"patch": save_patch, "epoch": epoch, "loss": loss_epoch}
-                state_saving(state=state_dict, epoch=epoch, loss=loss_epoch, path=self._offline_dir)
+                state_dict = {"patch": save_patch, "epoch": self._epoch, "loss": loss_epoch}
+                state_saving(state=state_dict, epoch=self._epoch, loss=loss_epoch, path=self._offline_dir)
 
     def _init_dir(self, contents: list, exclude=None):
         if exclude is None:

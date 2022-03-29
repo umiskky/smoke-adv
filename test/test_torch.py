@@ -1,14 +1,26 @@
+import os.path as osp
+import random
+
 import torch
-import torch.nn.functional as F
+
+
+def patch(patch_path):
+    project_path = "/home/dingxl/workspace/smoke-adv/"
+    fp = osp.join(project_path, patch_path)
+    if osp.exists(fp):
+        state = torch.load(fp)
+        patch = state.get("patch")
+        pass
+
 
 if __name__ == "__main__":
-    # test = torch.tensor([[[1.0, 2], [3, 4]], [[8, 7], [10, 9]], [[5, 12], [11, 6]]], device="cuda:0")
-    # print((torch.norm(test, p='fro', dim=[1, 2])).split(1, dim=0))
-    # print(torch.norm(test, p=float('inf'), dim=[1, 2]))
-    # print(torch.norm(test, p=1, dim=[1, 2]))
-    # print(test)
-    test1 = 0
-    test2 = torch.tensor([1.2, 2.2, 0, 1.5])
-    print(test1 + torch.flatten(F.softmax(test2, dim=0)))
-
+    # patch_path = "data/results/2022-03-28-17-07/visualization/patch/00270_000.49891_patch.pth"
+    # patch(patch_path)
+    times = 180
+    angle_range = [90, 270]
+    angle_list = [random.randint(0, (angle_range[1] - angle_range[0]) // times) +
+                  i * ((angle_range[1] - angle_range[0]) // times) +
+                  angle_range[0]
+                  for i in range(times)]
+    print(angle_list)
 

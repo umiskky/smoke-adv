@@ -65,7 +65,7 @@ class Pipeline(nn.Module):
         # =====================================================
 
         # ===================== load loss =====================
-        if self._enable["attack"]:
+        if self._enable["loss"]:
             self.loss = Loss(args.cfg_attack)
         else:
             self.loss = None

@@ -54,8 +54,14 @@ def main(args):
                        device=cfg.cfg_global["device"])
 
     while train_flag:
+        # Sync visualization epoch
+        pipeline.visualization.epoch = epoch
+        # Init for new epoch
         _epoch_loss = 0
-        for _, data in enumerate(pipeline.dataset.data):
+        dataset = pipeline.dataset.dataset_generator()
+        for _, data in enumerate(dataset):
+            # Sync visualization step
+            pipeline.visualization.step = step
             try:
                 with time_block("Forward & Backward & Step"):
                     loss = pipeline.forward(data)
@@ -75,8 +81,6 @@ def main(args):
                 # # Visualization Pipeline
                 with time_block("Vis"):
                     pipeline.visualization.vis(scenario_index=data[0],
-                                               epoch=epoch,
-                                               step=step,
                                                scenario=pipeline.scenario,
                                                renderer=pipeline.renderer,
                                                stickers=pipeline.stickers,
@@ -93,16 +97,16 @@ def main(args):
         print("==============================================================")
         print("epoch: %04d" % epoch +
               "   epoch_loss: %.10f" % _epoch_loss +
-              "   mean_loss: %.10f" % (_epoch_loss/len(pipeline.dataset.data)))
+              "   mean_loss: %.10f" % (_epoch_loss/len(dataset)))
         print("==============================================================\n")
 
         # log
         logger.logger_comet.log_metric("loss_epoch", _epoch_loss, epoch=epoch)
-        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(pipeline.dataset.data), epoch=epoch)
+        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(dataset), epoch=epoch)
         # save patch
-        pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+        pipeline.visualization.save_patch(_epoch_loss, pipeline.stickers)
         # eval perturbation norm
-        pipeline.visualization.eval_norm(epoch, pipeline.object_loader, pipeline.stickers)
+        pipeline.visualization.eval_norm(pipeline.object_loader, pipeline.stickers)
         # check if you can stop training
         if _epoch_loss <= cfg.cfg_attack["target_score"]:
             train_flag = False
@@ -112,10 +116,9 @@ def main(args):
         # save patch before exit
         if not train_flag:
             # save patch
-            pipeline.visualization.save_patch(epoch, _epoch_loss, pipeline.stickers)
+            pipeline.visualization.save_patch(_epoch_loss, pipeline.stickers)
 
         # clear and prepare for the next epoch
-        _epoch_loss = 0
         step_loss_list = []
         epoch += 1
 
