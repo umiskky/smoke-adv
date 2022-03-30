@@ -4,8 +4,8 @@ global:
   project_path: "/home/dingxl/workspace/smoke-adv/"
   device: "cuda:0"
 
-#dataset:
-#  meta: "test/pipe/meta.yaml"
+dataset:
+  meta: "evaluate/pipe/meta.yaml"
 
 enable:
   object: true
@@ -13,6 +13,7 @@ enable:
   scenario: true
   renderer: true
   smoke: true
+  loss: false
   attack: false
   logger: true
 
@@ -21,6 +22,7 @@ logger:
       confidence_threshold: 0.25
   local:
     vis_plt: true
-    plt_content: ["scenario", "render_bg", "render_scenario", "detection_2d", "detection_3d"]
+#    plt_content: ["scenario", "render_bg", "render_scenario", "detection_2d", "detection_3d"]
+    plt_content: ["detection_2d"]
 
 

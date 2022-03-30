@@ -20,7 +20,8 @@ class Dataset(tud.Dataset):
                 self._logger_console.error("The Project Path in env is None.")
             raise ValueError('The Project Path in env is None.')
         self._meta_file = osp.join(self._project_path, args["meta"])
-        self._data, self._scenario_indexes, self._data_dict = self._load_meta_from_yaml(self._meta_file, osp.join(self._project_path, args["calib_dir"]))
+        self._data, self._scenario_indexes, self._data_dict = \
+            self._load_meta_from_yaml(self._meta_file, osp.join(self._project_path, args["calib_dir"]))
 
     def __getitem__(self, index):
         return self._data[index]

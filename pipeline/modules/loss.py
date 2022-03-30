@@ -6,51 +6,57 @@ from smoke.utils import AffineUtils
 
 
 class Loss:
-    target_map = {"CAR": 0, "CYCLIST": 1, "WALKER": 2}
+    target_map = {"CAR": 0, "CYCLIST": 1, "WALKER": 2, "": -1}
 
     def __init__(self, args: dict) -> None:
-        self.device = args["device"]
-        self.type = args["loss"]["type"]
-        self.threshold = args["loss"]["threshold"]
-        self.iou = args["loss"]["iou"]
-        self.target = self.target_map[args["target"]]
+        self._device = args["device"]
+        self._type = args["loss"]["type"]
+        self._threshold = args["loss"]["threshold"]
+        self._iou = args["loss"]["iou"]
+        self._target = []
+        targets = args["target"]
+        if isinstance(targets, list):
+            for target in targets:
+                self._target.append(self.target_map.get(target))
+        elif isinstance(targets, str):
+            self._target.append(targets)
 
     def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor, K=None, scenario_size=None):
         res = None
-        box3d_branch_score_filtered = self.filter_with_threshold(box3d_branch, self.threshold)
-        box3d_branch_target_filtered = self.filter_with_target(box3d_branch_score_filtered, self.target)
+        box3d_branch_score_filtered = self._filter_with_threshold(box3d_branch, self._threshold)
+        box3d_branch_target_filtered = self._filter_with_target(box3d_branch_score_filtered, self._target)
         if box3d_branch_target_filtered.shape[0] == 0:
             return None
-        if "class" == self.type:
-            res = self.get_class_loss(box3d_branch_target_filtered)
-        if "2d_iou" == self.type:
-            assert self.iou >= 0
+        if "class" == self._type:
+            res = self._get_class_loss(box3d_branch_target_filtered)
+        if "2d_iou" == self._type:
+            assert self._iou >= 0
             box_2d = box3d_branch_target_filtered.detach().clone() \
                 if box3d_branch_target_filtered.requires_grad \
                 else box3d_branch_target_filtered.clone()
             box_2d = box_2d[:, 2:6]
-            res = self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
-                                          iou_threshold=self.iou,
-                                          box_2d_gt=box_pseudo_gt["2d"],
-                                          box_2d=box_2d)
+            res = self._get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
+                                           iou_threshold=self._iou,
+                                           box_2d_gt=box_pseudo_gt["2d"],
+                                           box_2d=box_2d)
         # Get 2D Box from 3D Box
-        if "2d_iou_fake" == self.type and K is not None:
-            assert self.iou >= 0
+        if "2d_iou_fake" == self._type and K is not None:
+            assert self._iou >= 0
             assert scenario_size is not None
             K = Smoke.getIntrinsicMatrix(K=K,
                                          is_inverse=False,
                                          device="cpu")
-            _, box_2d = self.decode_boxes(box3d_branch=box3d_branch_target_filtered,
-                                          K=K,
-                                          ori_img_size=scenario_size)
-            res = self.get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
-                                          iou_threshold=self.iou,
-                                          box_2d_gt=box_pseudo_gt["2d"],
-                                          box_2d=box_2d)
+            _, box_2d = self._decode_boxes(box3d_branch=box3d_branch_target_filtered,
+                                           K=K,
+                                           ori_img_size=scenario_size)
+            res = self._get_2d_gt_iou_loss(box3d_branch=box3d_branch_target_filtered,
+                                           iou_threshold=self._iou,
+                                           box_2d_gt=box_pseudo_gt["2d"],
+                                           box_2d=box_2d)
         return res
 
     @staticmethod
-    def get_class_loss(box3d_branch: torch.Tensor):
+    def _get_class_loss(box3d_branch: torch.Tensor):
         """
         get sum of scores.\n
         :param box3d_branch: smoke output branch.
@@ -62,7 +68,7 @@ class Loss:
         return loss
 
     @staticmethod
-    def get_2d_gt_iou_loss(box3d_branch: torch.Tensor, iou_threshold: float, box_2d_gt, box_2d):
+    def _get_2d_gt_iou_loss(box3d_branch: torch.Tensor, iou_threshold: float, box_2d_gt, box_2d):
         if box3d_branch.shape[0] == 0:
             return None
         # Calculate Indexes
@@ -79,12 +85,12 @@ class Loss:
         else:
             return None
 
-    def get_3d_gt_iou_loss(self):
+    def _get_3d_gt_iou_loss(self):
 
         pass
 
     @staticmethod
-    def filter_with_threshold(box3d_branch: torch.Tensor, threshold: float):
+    def _filter_with_threshold(box3d_branch: torch.Tensor, threshold: float):
         """filter box3d_branch with score threshold"""
         if threshold >= 0 and box3d_branch.shape[0] > 0:
             keep_idx = torch.nonzero(box3d_branch[:, -1] > threshold).squeeze()
@@ -94,14 +100,26 @@ class Loss:
             return box3d_branch
 
     @staticmethod
-    def filter_with_target(box3d_branch: torch.Tensor, target: int):
+    def _filter_with_target(box3d_branch: torch.Tensor, targets: list):
         """filter box3d_branch with target"""
-        keep_idx = torch.nonzero(box3d_branch[:, 0].int() == target).squeeze()
+        keep_idx = None
+        if len(targets) == 1 and targets[0] == -1:
+            return box3d_branch
+        for target in targets:
+            # do not filter
+            if target == -1:
+                continue
+            if keep_idx is None:
+                keep_idx = torch.nonzero(box3d_branch[:, 0].int() == target).squeeze()
+            else:
+                keep_idx = torch.cat((keep_idx,
+                                      torch.nonzero(box3d_branch[:, 0].int() == target).squeeze()),
+                                     0)
         box3d_branch_ = box3d_branch.index_select(0, keep_idx)
         return box3d_branch_
 
     @staticmethod
-    def decode_boxes(box3d_branch: torch.Tensor, K: torch.Tensor, ori_img_size) -> (torch.Tensor, torch.Tensor):
+    def _decode_boxes(box3d_branch: torch.Tensor, K: torch.Tensor, ori_img_size) -> (torch.Tensor, torch.Tensor):
         """decode 3D Box to get 2D Box"""
         if box3d_branch.shape[0] == 0:
             return None

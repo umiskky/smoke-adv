@@ -29,9 +29,9 @@ def draw_3d_box(image, obstacle, color_map=None):
         color_map = {0: (255, 167, 38), 1: (38, 198, 218), 2: (156, 204, 101)}
     # 2*8 -> 8*2 8 points with x-y coordinates
     corners = np.array(obstacle.box3d).transpose((1, 0))
-    class_name = Obstacle.type_map[obstacle.type.item()]
+    class_name = Obstacle.type_map[obstacle._type.item()]
     score = obstacle.score
-    color = color_map[obstacle.type.item()]
+    color = color_map[obstacle._type.item()]
 
     # ====================== draw 3d box ======================
     # 车头看向车位
@@ -94,9 +94,9 @@ def draw_2d_box(image, obstacle, color_map=None, from_3d=False):
                   int(max(obstacle.box3d[1]))]
     else:
         box_2d = list(map(int, obstacle.box2d))
-    class_name = Obstacle.type_map[obstacle.type.item()]
+    class_name = Obstacle.type_map[obstacle._type.item()]
     score = obstacle.score
-    color = color_map[obstacle.type.item()]
+    color = color_map[obstacle._type.item()]
     label = class_name + ": " + "%.2f" % score
 
     # ====================== draw 2d box ======================

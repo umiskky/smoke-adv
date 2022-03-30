@@ -63,6 +63,22 @@ renderer:
     sigma: 1e-4
     gamma: 1e-4
 
+defense:
+  # Support Types: ["BitDepth", "MedianBlur", "GaussianBlur", "JpegCompression"]
+  type: "GaussianBlur"
+  bit_depth:
+    r_bits: 8
+    g_bits: 8
+    b_bits: 8
+  median_blur:
+    blur_limit: 3
+  gaussian_blur:
+    blur_limit: 3
+    sigma_limit: 0.5
+  jpeg_compression:
+    quality_lower: 0.0
+    quality_upper: 100.0
+
 smoke:
   model_path: "data/model/smoke_libtorch_model.pth"
   transform:
