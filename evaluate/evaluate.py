@@ -38,7 +38,8 @@ def main(args):
 
     # Sync visualization epoch
     pipeline.visualization.epoch = epoch
-    for _, data in enumerate(pipeline.dataset.data):
+    dataset = pipeline.dataset.dataset_generator()
+    for _, data in enumerate(dataset):
         # Sync visualization step
         pipeline.visualization.step = step
         try:
@@ -69,12 +70,12 @@ def main(args):
     print("==============================================================")
     print("epoch: %04d" % epoch +
           "   epoch_loss: %.10f" % _epoch_loss +
-          "   mean_loss: %.10f" % (_epoch_loss / len(pipeline.dataset.data)))
+          "   mean_loss: %.10f" % (_epoch_loss / len(dataset)))
     print("==============================================================\n")
 
     # log
     logger.logger_comet.log_metric("loss_epoch", _epoch_loss, epoch=epoch)
-    logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss / len(pipeline.dataset.data), epoch=epoch)
+    logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss / len(dataset), epoch=epoch)
 
     # ensure all metrics and code are logged before exiting
     logger.close_logger()

@@ -2,7 +2,10 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from pytorch3d.renderer import look_at_view_transform, PerspectiveCameras, AmbientLights, RasterizationSettings, \
-    BlendParams, MeshRenderer, MeshRasterizer, PointLights, SoftPhongShader
+    BlendParams, MeshRasterizer, PointLights
+
+from render.mesh_renderer import MeshRendererWithMask
+from render.shader import Shader
 
 
 class Renderer:
@@ -30,7 +33,7 @@ class Renderer:
         """
 
         # Init
-        render_in_scenario = render_in_bg = None
+        synthesis_img = render_in_scenario = render_in_bg = None
         render_size = scenario.shape[:2] if scenario is not None else self._render_size
 
         # =========================== create new renderer ===========================
@@ -41,27 +44,38 @@ class Renderer:
                                        light=light, device=self._device)
         # ===========================================================================
 
-        # ======================== Render in black background =======================
-        # HWC -> RGB -> 0~1.0 torch.Tensor
-        render_in_bg = self._render_in_bg(mesh=mesh, renderer=renderer, img_size=render_size)
-        synthesis_normalized_img = render_in_bg
-        # ===========================================================================
+        # # ======================== Render in black background =======================
+        # # HWC -> RGB -> 0~1.0 torch.Tensor
+        # render_in_bg = self._render_in_bg(mesh=mesh, renderer=renderer, img_size=render_size)
+        # synthesis_normalized_img = render_in_bg
+        # # ===========================================================================
 
-        # Eval 2D box pseudo gt label
-        self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt(render_in_bg, background_color=self._background_color)
-
-        # Merge render_in_bg and scenario
+        # ================================== Render =================================
         if scenario is not None:
             # preprocessing ...
             scenario_tensor = self._get_normalized_img_tensor(scenario, self._device)
-            render_in_scenario = self._merge_render_target(mesh_in_back=render_in_bg,
-                                                           target=scenario_tensor,
-                                                           background_color=self._background_color,
-                                                           device=self._device)
-            synthesis_normalized_img = render_in_scenario
+            render_result, mask = renderer(mesh, background=scenario_tensor.unsqueeze(0))
+            synthesis_normalized_img = render_in_bg = render_in_scenario = render_result[0, ..., :3]
+            self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt(mask)
+            # 0~255.0
+            synthesis_img = synthesis_normalized_img * 255.0
+        # ===========================================================================
 
-        # 0~255.0
-        synthesis_img = synthesis_normalized_img * 255.0
+        # # Eval 2D box pseudo gt label
+        # self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt_from_bg(render_in_bg, background_color=self._background_color)
+        #
+        # # Merge render_in_bg and scenario
+        # if scenario is not None:
+        #     # preprocessing ...
+        #     scenario_tensor = self._get_normalized_img_tensor(scenario, self._device)
+        #     render_in_scenario = self._merge_render_target(mesh_in_back=render_in_bg,
+        #                                                    target=scenario_tensor,
+        #                                                    background_color=self._background_color,
+        #                                                    device=self._device)
+        #     synthesis_normalized_img = render_in_scenario
+
+        # # 0~255.0
+        # synthesis_img = synthesis_normalized_img * 255.0
 
         # ============================== Visualization ==============================
         with torch.no_grad():
@@ -84,7 +98,7 @@ class Renderer:
     @staticmethod
     def _render_in_bg(mesh, renderer, img_size) -> torch.Tensor:
         # render mesh in the background
-        mesh_in_back = renderer(mesh)
+        mesh_in_back, _ = renderer(mesh)
         # TODO
         # C H W
         mesh_in_back = F.adaptive_avg_pool2d(mesh_in_back[0, ..., :3].permute(2, 0, 1).unsqueeze(0),
@@ -158,12 +172,12 @@ class Renderer:
             image_size=(img_size[0] * quality_rate, img_size[1] * quality_rate),
         )
         # Renderer
-        renderer = MeshRenderer(
+        renderer = MeshRendererWithMask(
             rasterizer=MeshRasterizer(
                 cameras=camera,
                 raster_settings=raster_settings
             ),
-            shader=SoftPhongShader(
+            shader=Shader(
                 device=device,
                 cameras=camera,
                 lights=light,
@@ -173,7 +187,16 @@ class Renderer:
         return renderer
 
     @staticmethod
-    def _eval_2d_pseudo_gt(render_in_bg, background_color):
+    def _eval_2d_pseudo_gt(mask):
+        index = torch.nonzero(mask.squeeze()).T
+        y_min = index[0].min()
+        x_min = index[1].min()
+        y_max = index[0].max()
+        x_max = index[1].max()
+        return [x_min, y_min, x_max, y_max]
+
+    @staticmethod
+    def _eval_2d_pseudo_gt_from_bg(render_in_bg, background_color):
         # Calculate Pseudo 2D Box GT
         with torch.no_grad():
             if render_in_bg.requires_grad:

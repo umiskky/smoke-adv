@@ -140,6 +140,8 @@ logger:
     plt_content: ["detection_2d", "detection_3d"]
     # Save Fig in your local computer.
     vis_offline: false
+    # offline dir (corresponding to the project path)
+    off_dir: "data/results"
     # Support types: texture, scenario, render_bg, render_scenario, detection_3d, detection_2d, patch(save).
     off_content: ["detection_2d", "detection_3d", "scenario"]
     # Save patch each patch_save_frequency

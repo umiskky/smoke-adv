@@ -18,11 +18,13 @@ enable:
   logger: true
 
 logger:
-  common:
-      confidence_threshold: 0.15
   local:
-    vis_plt: true
+    vis_plt: false
 #    plt_content: ["scenario", "render_bg", "render_scenario"]
-    plt_content: ["render_scenario"]
+    plt_content: ["render_bg"]
+    vis_offline: true
+    off_dir: "data/results/test/"
+    off_content: [ "render_bg"]
+    patch_save_frequency: 1
 
 

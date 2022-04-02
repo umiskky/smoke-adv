@@ -60,6 +60,7 @@ class Smoke:
         return box3d_branch, feat_branch
 
     def smoke_transform(self, scenario) -> (torch.Tensor, list):
+        """scenario must be 0~255.0 float32"""
         scenario_input = None
         if isinstance(scenario, np.ndarray):
             scenario_input = torch.tensor(scenario, device=self._device).float()

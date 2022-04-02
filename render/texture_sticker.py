@@ -78,7 +78,8 @@ class TextureSticker:
         h: torch.Tensor = torch.select(texture_hls_patch, -3, 0)
         l: torch.Tensor = torch.select(texture_hls_patch, -3, 1)
         s: torch.Tensor = torch.select(texture_hls_patch, -3, 2)
-        l_ = torch.clamp(l, min=0, max=1)
+        eps = 1e-10
+        l_ = torch.clamp(l, min=eps, max=1)
         texture_hls_patch = torch.stack([h, l_, s], dim=-3).unsqueeze(0)
 
         # HLS -> RGB

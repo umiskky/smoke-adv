@@ -10,9 +10,10 @@ def main_pipe(args):
     pipeline = Pipeline(cfg)
 
     dataset = pipeline.dataset.dataset_generator()
-    pipeline.visualization.step = 0
+    step = 0
     pipeline.visualization.epoch = 0
     for _, data in enumerate(dataset):
+        pipeline.visualization.step = step
         try:
             pipeline.forward(data)
             # Visualization Pipeline
@@ -25,3 +26,4 @@ def main_pipe(args):
             print("Stop Attack Manually!")
             logger.close_logger()
         logger.close_logger()
+        step += 1

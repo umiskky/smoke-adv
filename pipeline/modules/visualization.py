@@ -29,7 +29,7 @@ class Visualization:
         self._plt_content = args["local"]["plt_content"]
         # vis offline in local computer
         self._enable_vis_offline = args["local"]["vis_offline"]
-        self._offline_dir = osp.join(self._project_path, "data/results", self._timestamp, "visualization")
+        self._offline_dir = osp.join(self._project_path, args["local"]["off_dir"], self._timestamp, "visualization")
         self._off_content = args["local"]["off_content"]
         self._patch_save_frequency = args["local"]["patch_save_frequency"]
 

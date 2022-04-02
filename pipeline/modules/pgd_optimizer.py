@@ -50,6 +50,7 @@ class PGDOptimizer:
             if alpha != 0:
                 perturbation = alpha * torch.sign(d_param)
                 perturbation = perturbation.to(self._device)
+                # 1 -> l channel
                 param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] += \
                     perturbation[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]]
                 param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] = \
