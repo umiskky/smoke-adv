@@ -3,6 +3,7 @@ base: "data/config/base.yaml"
 global:
   project_path: "/home/dingxl/workspace/smoke-adv/"
   device: "cuda:0"
+  debug: false
 
 enable:
   object: true
@@ -17,6 +18,7 @@ enable:
 dataset:
   meta: "data/config/meta_5.yaml"
   random:
+    frequency: 1
     # random rotation
     rotation:
       enable: true
@@ -25,34 +27,37 @@ dataset:
     # random translate
     translate:
       enable: true
-      lateral: [ -0.1, 0.1 ]
-      longitudinal: [ -0.1, 0.1 ]
+      lateral: [ -0.05, 0.05 ]
+      longitudinal: [ -0.05, 0.05 ]
 
 object:
   obj_path: "data/objects/man_512/man.obj"
 
 stickers:
   mask:
-    half_sleeve: "data/objects/man_512/mask_half_sleeve_simple.jpg"
-#    jeans: "data/objects/man/mask_jeans.jpg"
+    half_sleeve: "data/objects/man_512/mask_half_sleeve.jpg"
+#    half_sleeve: "data/objects/man_512/mask_half_sleeve_simple.jpg"
+#    jeans: "data/objects/man_512/mask_jeans.jpg"
   texture: [ 1, 3, 512, 512 ]
   size: [ 512, 512 ]
   position: [ 0, 0 ]
 
 attack:
-  target: "WALKER"
-  target_score: 0.05
+  target: ["WALKER", "CYCLIST"]
+  target_score: 0.10
   loss:
-    threshold: -1
-    iou: 0.1
+    type: "3d_score_mix"
+    threshold: 0.10
+    iou: 0.2
+    radius: 10
   optimizer:
-    alpha: 0.05
-    clip_min: -0.4
-    clip_max: 0.4
+    alpha: 0.1
+    clip_min: -0.2
+    clip_max: 0.2
 
 logger:
   common:
-      confidence_threshold: 0.1
+      confidence_threshold: 0.10
   comet:
     enable: true
     test: false
@@ -60,14 +65,21 @@ logger:
   local:
     vis_offline: true
     off_content: ["patch", "texture", "detection_2d", "detection_3d"]
-    patch_save_frequency: 10
-#    vis_plt: true
+    patch_save_frequency: 1
+    off_dir: "data/results/train"
+    vis_plt: false
 ##    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
-#    plt_content: ["render_scenario"]
+    plt_content: ["detection_3d"]
 
 # Use for comet.ml experiment results filter, no params are controlled
 tags:
   scenario_num: 3
   position_num: 5
+  texture: 512
+  target: ["WALKER", "CYCLIST"]
+  loss_type: "3d_score_mix"
+  step_type: "softmax"
+
+
 
 

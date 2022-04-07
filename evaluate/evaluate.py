@@ -38,7 +38,7 @@ def main(args):
 
     # Sync visualization epoch
     pipeline.visualization.epoch = epoch
-    dataset = pipeline.dataset.dataset_generator()
+    dataset = pipeline.dataset.generate()
     for _, data in enumerate(dataset):
         # Sync visualization step
         pipeline.visualization.step = step

@@ -14,6 +14,7 @@ class ObjectLoader:
                                device=self._device)
         self._verts: torch.Tensor = getattr(self._mesh, "_verts_list")[0].clone()
         self._textures: torch.Tensor = getattr(self._mesh.textures, "_maps_padded").clone()
+        self._box_pseudo_gt = {"3d": {"dimensions": args["size"]}}
 
     def forward(self, data: list):
         """
@@ -27,7 +28,7 @@ class ObjectLoader:
                                                 scale_rate=data[2],
                                                 device=self._device)
         self.apply_model_matrix(self._mesh, model_transform, self._verts.clone())
-        return self._mesh
+        return self._mesh, self._box_pseudo_gt
 
     @property
     def textures(self):
@@ -61,12 +62,16 @@ class ObjectLoader:
         :param scale_rate: scale rate. scalar.
         :return: None
         """
-        # World Coordinate
-        #  back to front
-        #        ^ y
-        #        |
-        #      z ⊙--> x
+        # World Coordinate    Model Coordinate
+        #             back to front
+        #      z ⊕→ x            ↑ y
+        #        ↓ y             z ⊙→ x
         transform = Transform3d(device=device)
+
+        # Model Coordinate To World Coordinate
+        # transform = transform.compose(RotateAxisAngle(angle=180, axis="Y", device=device))
+        transform = transform.compose(RotateAxisAngle(angle=180, axis="X", device=device))
+        # Model Transform
         transform = transform.compose(Scale(scale_rate, device=device))
         transform = transform.compose(RotateAxisAngle(angle=rotation[0], axis="X", device=device))
         transform = transform.compose(RotateAxisAngle(angle=rotation[1], axis="Y", device=device))

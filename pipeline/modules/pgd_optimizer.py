@@ -19,6 +19,10 @@ class PGDOptimizer:
         self._grad_container = [[] * len(self._params)]
         self._device = device
 
+    @property
+    def super_params(self):
+        return self._super_params
+
     @torch.no_grad()
     def record(self):
         for param_idx, param in enumerate(self._params):
@@ -43,18 +47,19 @@ class PGDOptimizer:
             if len(self._grad_container[param_idx]) == 0:
                 continue
             if "softmax" == step_type and step_loss_list is not None:
+                assert isinstance(step_loss_list, list) and len(step_loss_list) == len(self._grad_container[param_idx])
                 d_param = self._softmax(self._grad_container[param_idx], step_loss_list)
             else:
                 # calculate in cpu to avoid out of memory error
                 d_param = self._mean(self._grad_container[param_idx])
-            if alpha != 0:
-                perturbation = alpha * torch.sign(d_param)
-                perturbation = perturbation.to(self._device)
-                # 1 -> l channel
-                param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] += \
-                    perturbation[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]]
-                param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] = \
-                    torch.clamp(param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]], min=clip_min, max=clip_max)
+
+            perturbation = alpha * torch.sign(d_param)
+            perturbation = perturbation.to(self._device)
+            # 1 -> l channel
+            param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] += \
+                perturbation[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]]
+            param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] = \
+                torch.clamp(param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]], min=clip_min, max=clip_max)
         # clear
         self._grad_container = [[] * len(self._params)]
 

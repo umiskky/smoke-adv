@@ -11,11 +11,11 @@
     scale: 0.009
     rotation: [ 0, 0, 0 ]
     translate:
-      - [ 4, 0, -10 ]
+      - [ 4, 0, 10 ]
 #      - [ 0, 0, -10 ]
-      - [ 0, 0, -10 ]
+      - [ 0, 0, 10 ]
   light:
     ambient_color: [ 0.28, 0.28, 0.28 ]
     diffuse_color: [ 0.25, 0.25, 0.25 ]
     specular_color: [ 0.0, 0.0, 0.0 ]
-    location: [ 10, 8, -6 ]
+    location: [ 10, -8, 6 ]

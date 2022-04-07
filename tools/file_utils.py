@@ -24,8 +24,20 @@ def makedirs(base: str, *target):
             os.makedirs(osp.join(base, *target))
 
 
-def state_saving(state: dict, epoch: int, loss: float,  path: str):
+def state_saving(state: dict, epoch: int, loss: float, path: str):
     saving_path = osp.join(path, "patch")
     makedirs(saving_path)
     file_name = "%05d" % epoch + "_" + ("%.5f" % abs(loss)).zfill(9) + "_patch.pth"
     torch.save(state, osp.join(saving_path, file_name))
+
+
+def update_dic(dic, base_dic):
+    """Update config from dic based base_dic"""
+    base_dic = base_dic.copy()
+    for key, val in dic.items():
+        if isinstance(val, dict) and key in base_dic:
+            base_dic[key] = update_dic(val, base_dic[key])
+        else:
+            base_dic[key] = val
+    dic = base_dic
+    return dic

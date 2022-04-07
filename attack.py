@@ -1,3 +1,7 @@
+"""
+This attack script:
+
+"""
 import argparse
 import os
 import os.path as osp
@@ -6,6 +10,7 @@ import torch
 
 from pipeline.modules.early_stop import EarlyStop
 from pipeline.modules.pgd_optimizer import PGDOptimizer
+from pipeline.modules.scheduler import ReduceLROnPlateau
 from pipeline.pipeline import Pipeline
 from tools.config import Config
 from tools.debug_utils import time_block
@@ -33,13 +38,14 @@ def main(args):
     logger.broadcast_logger(cfg.cfg_all, exclude=[])
     logger.logger_comet.log_parameters(logger.encode_config_for_log(cfg.cfg_for_log))
     workdir = os.getenv("project_path")
-    # log meta.yaml & attack.yaml
+    # log meta.yaml & base.yaml & attack.yaml
     logger.logger_comet.log_asset(osp.join(workdir, cfg.cfg_dataset["meta"]))
+    logger.logger_comet.log_asset(osp.join(workdir, "data/config/base.yaml"))
     logger.logger_comet.log_asset(osp.join(workdir, "data/config/attack.yaml"))
 
     pipeline = Pipeline(cfg)
 
-    es = EarlyStop(max_step=40)
+    es = EarlyStop(max_step=60)
     train_flag = True
     epoch = 0
     step = 0
@@ -52,13 +58,23 @@ def main(args):
                        position=cfg.cfg_stickers["position"],
                        size=cfg.cfg_stickers["size"],
                        device=cfg.cfg_global["device"])
+    sheduler = ReduceLROnPlateau(optimizer=pgd,
+                                 mode='min',
+                                 factor=0.2,
+                                 patience=10,
+                                 threshold=1e-4,
+                                 threshold_mode='rel',
+                                 cooldown=5,
+                                 min_lr=0,
+                                 eps=1e-8,
+                                 verbose=False)
 
     while train_flag:
         # Sync visualization epoch
         pipeline.visualization.epoch = epoch
         # Init for new epoch
         _epoch_loss = 0
-        dataset = pipeline.dataset.dataset_generator()
+        dataset = pipeline.dataset.generate()
         for _, data in enumerate(dataset):
             # Sync visualization step
             pipeline.visualization.step = step
@@ -93,16 +109,18 @@ def main(args):
                 step += 1
         # update patch
         pgd.step(step_type="softmax", step_loss_list=step_loss_list)
+        sheduler.step(_epoch_loss / len(dataset))
         # print to terminal
         print("==============================================================")
         print("epoch: %04d" % epoch +
               "   epoch_loss: %.10f" % _epoch_loss +
-              "   mean_loss: %.10f" % (_epoch_loss/len(dataset)))
+              "   mean_loss: %.10f" % (_epoch_loss / len(dataset)))
         print("==============================================================\n")
 
         # log
         logger.logger_comet.log_metric("loss_epoch", _epoch_loss, epoch=epoch)
-        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss/len(dataset), epoch=epoch)
+        logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss / len(dataset), epoch=epoch)
+        logger.logger_comet.log_metric("alpha", pgd.super_params.get("alpha"), epoch=epoch)
         # save patch
         pipeline.visualization.save_patch(_epoch_loss, pipeline.stickers)
         # eval perturbation norm

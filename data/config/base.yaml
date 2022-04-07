@@ -20,6 +20,7 @@ dataset:
   meta: "data/config/meta.yaml"
   calib_dir: "data/datasets/waymo/kitti_format/training/calib/"
   random:
+    frequency: 1
     # random rotation
     rotation:
       enable: false
@@ -36,6 +37,8 @@ dataset:
 
 object:
   obj_path: "data/objects/man/man.obj"
+  # model size(m) [x, y, z] = [w, h, l]
+  size: [0.55, 1.86, 0.48]
 
 stickers:
   type: "hls"
@@ -53,7 +56,7 @@ scenario:
 
 renderer:
   camera:
-    height: 1.85
+    height: 2.3
   light:
     type: "point"
   render:
@@ -96,9 +99,10 @@ attack:
   target: "WALKER"
   target_score: 0.0
   loss:
-    type: "2d_iou"
+    type: "score"
     threshold: 0.25
     iou: 0.05
+    radius: 3.0
   optimizer:
     alpha: 0.0002
     clip_min: -0.001

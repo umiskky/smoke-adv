@@ -19,10 +19,10 @@ enable:
 
 logger:
   local:
-    vis_plt: false
+    vis_plt: true
 #    plt_content: ["scenario", "render_bg", "render_scenario"]
     plt_content: ["render_bg"]
-    vis_offline: true
+    vis_offline: false
     off_dir: "data/results/test/"
     off_content: [ "render_bg"]
     patch_save_frequency: 1

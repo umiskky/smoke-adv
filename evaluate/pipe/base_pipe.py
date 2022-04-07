@@ -9,7 +9,8 @@ def main_pipe(args):
     logger.broadcast_logger(cfg.cfg_all, exclude=[])
     pipeline = Pipeline(cfg)
 
-    dataset = pipeline.dataset.dataset_generator()
+    # dataset = pipeline.dataset.generate()
+    dataset = pipeline.dataset.data
     step = 0
     pipeline.visualization.epoch = 0
     for _, data in enumerate(dataset):

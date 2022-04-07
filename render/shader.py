@@ -36,7 +36,7 @@ class Shader(SoftPhongShader):
             materials=materials,
         )
         znear = kwargs.get("znear", getattr(cameras, "znear", 1.0))
-        zfar = kwargs.get("zfar", getattr(cameras, "zfar", 100.0))
+        zfar = kwargs.get("zfar", getattr(cameras, "zfar", 500.0))
         images, mask = self.softmax_rgb_blend(
             colors, background, fragments, blend_params, znear=znear, zfar=zfar
         )
@@ -49,7 +49,7 @@ class Shader(SoftPhongShader):
             fragments,
             blend_params: BlendParams,
             znear: Union[float, torch.Tensor] = 1.0,
-            zfar: Union[float, torch.Tensor] = 100,
+            zfar: Union[float, torch.Tensor] = 100.0,
     ):
         """
         [0] Shichen Liu et al, 'Soft Rasterizer: A Differentiable Renderer for
@@ -107,6 +107,6 @@ class Shader(SoftPhongShader):
         weighted_background = delta * background_
         pixel_colors[..., :3] = (weighted_colors + weighted_background) / denom
         pixel_colors[..., 3] = 1.0 - alpha
-
+        # using torch.clamp to avoid numerical problem
         return torch.clamp(pixel_colors, min=0.0, max=1.0), mask
 

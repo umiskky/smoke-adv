@@ -23,8 +23,8 @@ class Renderer:
         )
         self._render_size = args["render"]["image_shape"]
 
-        # Pseudo 2D Box GT
-        self._box_pseudo_gt = {}
+        # Pseudo 2D&3D Box GT
+        self._box_pseudo_gt = {"3d": {"h_offset": float(self._camera_height)}}
         self.visualization = {}
 
     def forward(self, mesh, scenario, data: list):
@@ -54,9 +54,12 @@ class Renderer:
         if scenario is not None:
             # preprocessing ...
             scenario_tensor = self._get_normalized_img_tensor(scenario, self._device)
+            # render
             render_result, mask = renderer(mesh, background=scenario_tensor.unsqueeze(0))
             synthesis_normalized_img = render_in_bg = render_in_scenario = render_result[0, ..., :3]
+            # save some pseudo gt information
             self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt(mask)
+            self._box_pseudo_gt["3d"]["location"] = data[4]
             # 0~255.0
             synthesis_img = synthesis_normalized_img * 255.0
         # ===========================================================================
@@ -131,11 +134,10 @@ class Renderer:
         """
         # World Coordinate   Camera Coordinate
         #             back to front
-        #        ^ y                ^ y
-        #        |                  |
-        #      z ⊙--> x      x <-- ⊕ z
+        #      z ⊕→ x            ↑ y
+        #        ↓ y          x ← ⊕ z
         # camera position in world: (0, h, 0). h is the height of the camera to the ground.
-        R, T = look_at_view_transform(eye=((0, height, 0),), at=((0, height, -1),), device=device)
+        R, T = look_at_view_transform(eye=((0, -height, 0),), at=((0, -height, 1),), up=((0, -1, 0),), device=device)
         camera = PerspectiveCameras(focal_length=((K[0, 0], K[1, 1]),),
                                     principal_point=((K[0, 2], K[1, 2]),),
                                     in_ndc=False,
@@ -170,6 +172,7 @@ class Renderer:
         # Rasterization Setting
         raster_settings = RasterizationSettings(
             image_size=(img_size[0] * quality_rate, img_size[1] * quality_rate),
+            faces_per_pixel=3,
         )
         # Renderer
         renderer = MeshRendererWithMask(
@@ -189,10 +192,10 @@ class Renderer:
     @staticmethod
     def _eval_2d_pseudo_gt(mask):
         index = torch.nonzero(mask.squeeze()).T
-        y_min = index[0].min()
-        x_min = index[1].min()
-        y_max = index[0].max()
-        x_max = index[1].max()
+        y_min = index[0].min().item()
+        x_min = index[1].min().item()
+        y_max = index[0].max().item()
+        x_max = index[1].max().item()
         return [x_min, y_min, x_max, y_max]
 
     @staticmethod

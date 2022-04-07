@@ -40,22 +40,33 @@
 - Note
 
 - Coordinate System Define
-  -  ![coordinate_systems](data/docs/image/coordinate_systems.png)
+  - ![coordinate_systems](data/docs/image/coordinate_systems.png)
+  
   - World Coordinate
-    - 因为Waymo Open Dataset暂时找不到传感器之间详细的位置关系，所以暂时参考kitti设置
-    - ```
-      # from rear to front
-      #        ^ y    
-      #        |       
-      #      z ⊙--> x
-      ```
+    - 因为Waymo Open Dataset暂时找不到传感器之间详细的位置关系，所以暂时
+    
+      - 参考kitti设置
+    
+      - ```
+        # from rear to front
+        #        ^ y    
+        #        |       
+        #      z ⊙--> x
+        ```
+    
+      - 参考smoke模型输出结果，方便获得3D GT信息
+    
+      - ```
+    
   - Camera Coordinate
+  
     - ```
       # from rear to front
       #        ^ y
       #        |
       #  x <-- ⊕ z
       ```
+  
   - Image Coordinate
   
 - Pytorch 3D

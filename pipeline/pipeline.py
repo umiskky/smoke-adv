@@ -9,6 +9,7 @@ from render.scenario import Scenario
 from render.texture_sticker import TextureSticker
 from smoke.smoke import Smoke
 from tools.config import Config
+from tools.file_utils import update_dic
 
 
 class Pipeline(nn.Module):
@@ -91,11 +92,13 @@ class Pipeline(nn.Module):
             scenario, scenario_size = self.scenario.forward(scenario_index=data[0])
         # Render Pipeline
         if self.object_loader is not None:
-            mesh = self.object_loader.forward(data)
+            mesh, box_pseudo_gt_ = self.object_loader.forward(data)
+            box_pseudo_gt = update_dic(box_pseudo_gt_, box_pseudo_gt)
             if self.stickers is not None:
                 mesh = self.stickers.forward(mesh, enable_patch_grad=self._enable["attack"])
             if self.renderer is not None:
-                synthesis_img, box_pseudo_gt = self.renderer.forward(mesh, scenario, data)
+                synthesis_img, box_pseudo_gt_ = self.renderer.forward(mesh, scenario, data)
+                box_pseudo_gt = update_dic(box_pseudo_gt_, box_pseudo_gt)
         # Smoke Pipeline
         if self.smoke is not None:
             if self.renderer is not None:
@@ -105,6 +108,7 @@ class Pipeline(nn.Module):
             if self.loss is not None:
                 loss = self.loss.forward(box_pseudo_gt=box_pseudo_gt,
                                          box3d_branch=box3d_branch,
+                                         smoke=self.smoke,
                                          K=data[1],
                                          scenario_size=scenario_size)
                 return loss

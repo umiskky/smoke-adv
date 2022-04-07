@@ -22,6 +22,10 @@ class Dataset(tud.Dataset):
         self._meta_file = osp.join(self._project_path, args["meta"])
         self._data, self._scenario_indexes, self._data_dict = \
             self._load_meta_from_yaml(self._meta_file, osp.join(self._project_path, args["calib_dir"]))
+        # Use for data
+        self._counter = 0
+        self._frequency = int(self._random_args.get("frequency"))
+        self._data_with_augmentation = None
 
     def __getitem__(self, index):
         return self._data[index]
@@ -41,40 +45,44 @@ class Dataset(tud.Dataset):
     def data(self, data_):
         self._data = data_
 
-    def dataset_generator(self):
+    def generate(self):
         """Apply Random data augmentation"""
-        _dataset = []
-        for scenario_index in self._data_dict.keys():
-            scenario_data = []
-            for translate_index in self._data_dict.get(scenario_index).keys():
-                translate_item = self._data_dict.get(scenario_index).get(translate_index)
-                translate_data = []
-                # apply random rotation augmentation
-                if self._random_args["rotation"]["enable"]:
-                    assert self._random_args["rotation"]["times"] >= 1
-                    times = int(self._random_args["rotation"]["times"])
-                    angle_range = self._random_args["rotation"]["range"]
-                    angle_list = [random.randint(0,  (angle_range[1] - angle_range[0]) // times) +
-                                  i*((angle_range[1] - angle_range[0]) // times) +
-                                  angle_range[0]
-                                  for i in range(times)]
-                    for idx in range(times):
-                        translate_item_copy = copy.deepcopy(translate_item)
-                        translate_item_copy[3][1] = angle_list[idx]
-                        translate_data.append(translate_item_copy)
-                # if random rotation augmentation is disabled
-                if len(translate_data) == 0:
-                    translate_data.append(copy.deepcopy(translate_item))
-                # apply random translate augmentation
-                if self._random_args["translate"]["enable"]:
-                    lateral_range = self._random_args["translate"]["lateral"]
-                    longitudinal_range = self._random_args["translate"]["longitudinal"]
-                    for item in translate_data:
-                        item[4][0] += random.uniform(float(lateral_range[0]), float(lateral_range[1]))
-                        item[4][2] += random.uniform(float(longitudinal_range[0]), float(longitudinal_range[1]))
-                scenario_data.extend(translate_data)
-            _dataset.extend(scenario_data)
-        return _dataset
+        if self._data_with_augmentation is None or self._counter >= self._frequency:
+            _dataset = []
+            for scenario_index in self._data_dict.keys():
+                scenario_data = []
+                for translate_index in self._data_dict.get(scenario_index).keys():
+                    translate_item = self._data_dict.get(scenario_index).get(translate_index)
+                    translate_data = []
+                    # apply random rotation augmentation
+                    if self._random_args["rotation"]["enable"]:
+                        assert self._random_args["rotation"]["times"] >= 1
+                        times = int(self._random_args["rotation"]["times"])
+                        angle_range = self._random_args["rotation"]["range"]
+                        angle_list = [random.randint(0,  (angle_range[1] - angle_range[0]) // times) +
+                                      i*((angle_range[1] - angle_range[0]) // times) +
+                                      angle_range[0]
+                                      for i in range(times)]
+                        for idx in range(times):
+                            translate_item_copy = copy.deepcopy(translate_item)
+                            translate_item_copy[3][1] = angle_list[idx]
+                            translate_data.append(translate_item_copy)
+                    # if random rotation augmentation is disabled
+                    if len(translate_data) == 0:
+                        translate_data.append(copy.deepcopy(translate_item))
+                    # apply random translate augmentation
+                    if self._random_args["translate"]["enable"]:
+                        lateral_range = self._random_args["translate"]["lateral"]
+                        longitudinal_range = self._random_args["translate"]["longitudinal"]
+                        for item in translate_data:
+                            item[4][0] += random.uniform(float(lateral_range[0]), float(lateral_range[1]))
+                            item[4][2] += random.uniform(float(longitudinal_range[0]), float(longitudinal_range[1]))
+                    scenario_data.extend(translate_data)
+                _dataset.extend(scenario_data)
+            self._counter = 0
+            self._data_with_augmentation = _dataset
+        self._counter += 1
+        return copy.deepcopy(self._data_with_augmentation)
 
     @staticmethod
     def _load_meta_from_yaml(meta_file: str, calib_path: str):

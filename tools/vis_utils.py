@@ -34,7 +34,7 @@ def draw_3d_box(image, obstacle, color_map=None):
     color = color_map[obstacle.type.item()]
 
     # ====================== draw 3d box ======================
-    # 车头看向车位
+    # 车头看向车尾
     # 车头所在平面，左上角，顺时针，点为1、4、3、2
     # 车尾所在平面，左上角，顺时针，点为0、5、6、7
     face_idx = [[5, 4, 3, 6],
