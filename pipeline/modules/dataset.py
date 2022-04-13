@@ -59,8 +59,8 @@ class Dataset(tud.Dataset):
                         assert self._random_args["rotation"]["times"] >= 1
                         times = int(self._random_args["rotation"]["times"])
                         angle_range = self._random_args["rotation"]["range"]
-                        angle_list = [random.randint(0,  (angle_range[1] - angle_range[0]) // times) +
-                                      i*((angle_range[1] - angle_range[0]) // times) +
+                        angle_list = [random.randint(0, (angle_range[1] - angle_range[0]) // times) +
+                                      i * ((angle_range[1] - angle_range[0]) // times) +
                                       angle_range[0]
                                       for i in range(times)]
                         for idx in range(times):
@@ -108,12 +108,12 @@ class Dataset(tud.Dataset):
                     model_matrix_rotation = [0, 0, 0]
                     model_matrix_translate = [[0, 0, 0]]
                 if dic[scenario_idx] is not None and dic[scenario_idx]["light"] is not None:
-                    light_ambient_color = dic[scenario_idx]["light"].get("ambient_color")
-                    light_diffuse_color = dic[scenario_idx]["light"].get("diffuse_color")
-                    light_specular_color = dic[scenario_idx]["light"].get("specular_color")
+                    light_ambient_color = _color_formatter(dic[scenario_idx]["light"].get("ambient_color"))
+                    light_diffuse_color = _color_formatter(dic[scenario_idx]["light"].get("diffuse_color"))
+                    light_specular_color = _color_formatter(dic[scenario_idx]["light"].get("specular_color"))
                     light_location = dic[scenario_idx]["light"].get("location")
                 else:
-                    light_ambient_color = light_diffuse_color = light_specular_color = light_location = [0, 0, 0]
+                    light_ambient_color = light_diffuse_color = light_specular_color = light_location = [0.0, 0.0, 0.0]
 
                 item_num = len(model_matrix_translate)
                 # ============================ check valid or not ============================
@@ -178,6 +178,18 @@ class Dataset(tud.Dataset):
 
                 data_dict[str(scenario_idx)] = translate_dict
         return data, indexes, data_dict
+
+
+def _color_formatter(color: list):
+    for idx in range(len(color)):
+        if isinstance(color[idx], int):
+            color[idx] /= 255.0
+            color[idx] = _clip(color[idx])
+    return color
+
+
+def _clip(num, min_=0.0, max_=1.0):
+    return min(max(num, min_), max_)
 
 
 if __name__ == '__main__':

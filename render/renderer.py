@@ -172,7 +172,7 @@ class Renderer:
         # Rasterization Setting
         raster_settings = RasterizationSettings(
             image_size=(img_size[0] * quality_rate, img_size[1] * quality_rate),
-            faces_per_pixel=3,
+            faces_per_pixel=2,
         )
         # Renderer
         renderer = MeshRendererWithMask(

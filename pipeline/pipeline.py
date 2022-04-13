@@ -117,5 +117,5 @@ class Pipeline(nn.Module):
         result_list = [box3d_branch, synthesis_img, scenario]
         for result in result_list:
             if result is not None:
-                return result
+                return result, box_pseudo_gt
         return None

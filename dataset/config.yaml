@@ -1,0 +1,42 @@
+base: "data/config/base.yaml"
+
+global:
+  project_path: "/home/dingxl/workspace/smoke-adv/"
+  device: "cuda:0"
+
+dataset:
+  meta: "dataset/meta.yaml"
+
+enable:
+  object: true
+  stickers: false
+  scenario: true
+  renderer: true
+  smoke: true
+  loss: false
+  attack: false
+  logger: true
+
+renderer:
+  camera:
+    height: 2.3
+  light:
+    type: "point"
+  render:
+    sigma: 1e-6
+    gamma: 1e-6
+
+logger:
+  common:
+      confidence_threshold: 0.25
+  local:
+    vis_plt: true
+#    plt_content: ["scenario", "render_bg", "render_scenario", "detection_2d", "detection_3d"]
+    plt_content: ["detection_3d"]
+    vis_offline: false
+    off_dir: "data/results/test/"
+    off_content: ["render_scenario", "detection_2d", "detection_3d"]
+    patch_save_frequency: 1
+
+
+
