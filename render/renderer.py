@@ -1,9 +1,9 @@
 import numpy as np
 import torch
-import torch.nn.functional as F
 from pytorch3d.renderer import look_at_view_transform, PerspectiveCameras, AmbientLights, RasterizationSettings, \
     BlendParams, MeshRasterizer, PointLights
 
+from pipeline.modules.sample import Sample
 from render.mesh_renderer import MeshRendererWithMask
 from render.shader import Shader
 
@@ -27,28 +27,23 @@ class Renderer:
         self._box_pseudo_gt = {"3d": {"h_offset": float(self._camera_height)}}
         self.visualization = {}
 
-    def forward(self, mesh, scenario, data: list):
-        """data
-        [scenario_idx, K, scale, rotation, translate, ambient_color, diffuse_color, specular_color, location]
-        """
+    def forward(self, mesh, scenario, sample: Sample):
 
         # Init
         synthesis_img = render_in_scenario = render_in_bg = None
         render_size = scenario.shape[:2] if scenario is not None else self._render_size
 
         # =========================== create new renderer ===========================
-        camera = self._init_camera(height=self._camera_height, K=data[1], img_size=render_size, device=self._device)
-        light = self._init_light(light_args=data[5:9], light_type=self._light_type, device=self._device)
+        camera = self._init_camera(height=self._camera_height, K=sample.K, img_size=render_size, device=self._device)
+        light = self._init_light(light_type=self._light_type, device=self._device,
+                                 ambient_color=sample.light_ambient_color,
+                                 diffuse_color=sample.light_diffuse_color,
+                                 specular_color=sample.light_specular_color,
+                                 location=sample.light_location)
         renderer = self._init_renderer(quality_rate=self._quality_rate, img_size=render_size,
                                        blend_params=self._blend_params, camera=camera,
                                        light=light, device=self._device)
         # ===========================================================================
-
-        # # ======================== Render in black background =======================
-        # # HWC -> RGB -> 0~1.0 torch.Tensor
-        # render_in_bg = self._render_in_bg(mesh=mesh, renderer=renderer, img_size=render_size)
-        # synthesis_normalized_img = render_in_bg
-        # # ===========================================================================
 
         # ================================== Render =================================
         if scenario is not None:
@@ -59,26 +54,10 @@ class Renderer:
             synthesis_normalized_img = render_in_bg = render_in_scenario = render_result[0, ..., :3]
             # save some pseudo gt information
             self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt(mask)
-            self._box_pseudo_gt["3d"]["location"] = data[4]
+            self._box_pseudo_gt["3d"]["location"] = sample.location
             # 0~255.0
             synthesis_img = synthesis_normalized_img * 255.0
         # ===========================================================================
-
-        # # Eval 2D box pseudo gt label
-        # self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt_from_bg(render_in_bg, background_color=self._background_color)
-        #
-        # # Merge render_in_bg and scenario
-        # if scenario is not None:
-        #     # preprocessing ...
-        #     scenario_tensor = self._get_normalized_img_tensor(scenario, self._device)
-        #     render_in_scenario = self._merge_render_target(mesh_in_back=render_in_bg,
-        #                                                    target=scenario_tensor,
-        #                                                    background_color=self._background_color,
-        #                                                    device=self._device)
-        #     synthesis_normalized_img = render_in_scenario
-
-        # # 0~255.0
-        # synthesis_img = synthesis_normalized_img * 255.0
 
         # ============================== Visualization ==============================
         with torch.no_grad():
@@ -95,32 +74,7 @@ class Renderer:
             self.visualization["render_bg"] = vis_mesh_in_back
             self.visualization["render_scenario"] = vis_synthesis_img
         # ===========================================================================
-
         return synthesis_img, self._box_pseudo_gt
-
-    @staticmethod
-    def _render_in_bg(mesh, renderer, img_size) -> torch.Tensor:
-        # render mesh in the background
-        mesh_in_back, _ = renderer(mesh)
-        # TODO
-        # C H W
-        mesh_in_back = F.adaptive_avg_pool2d(mesh_in_back[0, ..., :3].permute(2, 0, 1).unsqueeze(0),
-                                             (img_size[0], img_size[1]))
-        # H W C
-        mesh_in_back = mesh_in_back[0, :].permute(1, 2, 0)
-        return mesh_in_back
-
-    @staticmethod
-    def _merge_render_target(mesh_in_back, target, background_color, device="cpu") -> torch.Tensor:
-        synthesis_img = None
-        # background color is set to black which is convenient for merge
-        if background_color == (0.0, 0.0, 0.0):
-            mask_indexes = torch.nonzero(mesh_in_back.sum(2))
-            mask_indexes = mask_indexes[:, 0], mask_indexes[:, 1]
-            mask = torch.ones(mesh_in_back.shape, device=device)
-            mask = mask.index_put(mask_indexes, torch.tensor([0.0, 0.0, 0.0], device=device))
-            synthesis_img = target * mask + mesh_in_back
-        return synthesis_img
 
     @staticmethod
     def _init_camera(height, K, img_size, device="cpu"):
@@ -148,16 +102,20 @@ class Renderer:
         return camera
 
     @staticmethod
-    def _init_light(light_args: list, light_type="point", device="cpu"):
+    def _init_light(light_type="point", device="cpu", **light_args):
         """light_args = [ambient_color, diffuse_color, specular_color, location]"""
         light = None
         if "ambient" == light_type:
             light = AmbientLights(device=device)
         if "point" == light_type:
-            light = PointLights(ambient_color=(tuple(light_args[0]),),
-                                diffuse_color=(tuple(light_args[1]),),
-                                specular_color=(tuple(light_args[2]),),
-                                location=(tuple(light_args[3]),),
+            ambient_color = light_args.get("ambient_color") if light_args.get("ambient_color") else (0.5, 0.5, 0.5)
+            diffuse_color = light_args.get("diffuse_color") if light_args.get("diffuse_color") else (0.3, 0.3, 0.3)
+            specular_color = light_args.get("specular_color") if light_args.get("specular_color") else (0.2, 0.2, 0.2)
+            location = light_args.get("location") if light_args.get("location") else (0, 1, 0)
+            light = PointLights(ambient_color=(tuple(ambient_color),),
+                                diffuse_color=(tuple(diffuse_color),),
+                                specular_color=(tuple(specular_color),),
+                                location=(tuple(location),),
                                 device=device)
         return light
 

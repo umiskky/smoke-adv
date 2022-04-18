@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from torchvision.transforms import transforms
 
+from pipeline.modules.sample import Sample
+
 
 class Smoke:
 
@@ -18,7 +20,7 @@ class Smoke:
 
         self.visualization = {}
 
-    def forward(self, scenario, data: list, is_training=False) -> (torch.Tensor, torch.Tensor):
+    def forward(self, scenario, sample: Sample, is_training=False) -> (torch.Tensor, torch.Tensor):
         """ data
         [scenario_idx, K, scale, rotation, translate, ambient_color, diffuse_color, specular_color, location]
         """
@@ -29,7 +31,7 @@ class Smoke:
 
         # preprocessing ... transform
         scenario_input, scenario_size = self.smoke_transform(scenario)
-        K_Inverse = self.getIntrinsicMatrix(K=data[1], device=self._device)
+        K_Inverse = self.getIntrinsicMatrix(K=sample.K_inverse, device=self._device)
         ratio = self.getInputRatio(scenario_size=scenario_size,
                                    input_size=self._input_size,
                                    down_ration=self._down_ratio,
@@ -52,7 +54,7 @@ class Smoke:
             else:
                 vis_scenario = scenario
             self.visualization["detection"] = vis_box3d_branch
-            self.visualization["K"] = self.getIntrinsicMatrix(K=data[1], is_inverse=False, device="cpu")
+            self.visualization["K"] = self.getIntrinsicMatrix(K=sample.K, device="cpu")
             self.visualization["scenario_size"] = scenario_size
             # np.ndarray HWC int8
             self.visualization["scenario"] = vis_scenario
@@ -80,13 +82,10 @@ class Smoke:
         return scenario_input_, scenario_size
 
     @staticmethod
-    def getIntrinsicMatrix(K: np.ndarray, is_inverse=True, device="cpu"):
-        k = K
+    def getIntrinsicMatrix(K: np.ndarray, device="cpu"):
         if len(K.shape) == 2:
-            k = K[None, :, :]
-        if is_inverse:
-            return torch.tensor(np.linalg.inv(k), device=device)
-        return torch.tensor(k, device=device)
+            K = K[None, ...]
+        return torch.tensor(K, device=device)
 
     @staticmethod
     def getInputRatio(scenario_size, input_size, down_ration, device="cpu"):

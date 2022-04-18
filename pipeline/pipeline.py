@@ -2,6 +2,7 @@ import torch.nn as nn
 
 from pipeline.modules.dataset import Dataset
 from pipeline.modules.loss import Loss
+from pipeline.modules.sample import Sample
 from pipeline.modules.visualization import Visualization
 from render.object_loader import ObjectLoader
 from render.renderer import Renderer
@@ -79,7 +80,7 @@ class Pipeline(nn.Module):
             self.visualization = None
         # =====================================================
 
-    def forward(self, data):
+    def forward(self, sample: Sample):
         """ data
         [scenario_idx, K, scale, rotation, translate(list), ambient_color, diffuse_color, specular_color, location]
         """
@@ -89,27 +90,27 @@ class Pipeline(nn.Module):
 
         # Scenario
         if self.scenario is not None:
-            scenario, scenario_size = self.scenario.forward(scenario_index=data[0])
+            scenario, scenario_size = self.scenario.forward(scenario_index=sample.scenario_index)
         # Render Pipeline
         if self.object_loader is not None:
-            mesh, box_pseudo_gt_ = self.object_loader.forward(data)
+            mesh, box_pseudo_gt_ = self.object_loader.forward(sample)
             box_pseudo_gt = update_dic(box_pseudo_gt_, box_pseudo_gt)
             if self.stickers is not None:
                 mesh = self.stickers.forward(mesh, enable_patch_grad=self._enable["attack"])
             if self.renderer is not None:
-                synthesis_img, box_pseudo_gt_ = self.renderer.forward(mesh, scenario, data)
+                synthesis_img, box_pseudo_gt_ = self.renderer.forward(mesh, scenario, sample)
                 box_pseudo_gt = update_dic(box_pseudo_gt_, box_pseudo_gt)
         # Smoke Pipeline
         if self.smoke is not None:
             if self.renderer is not None:
-                box3d_branch, _ = self.smoke.forward(synthesis_img, data)
+                box3d_branch, _ = self.smoke.forward(synthesis_img, sample)
             elif scenario is not None:
-                box3d_branch, _ = self.smoke.forward(scenario, data)
+                box3d_branch, _ = self.smoke.forward(scenario, sample)
             if self.loss is not None:
                 loss = self.loss.forward(box_pseudo_gt=box_pseudo_gt,
                                          box3d_branch=box3d_branch,
                                          smoke=self.smoke,
-                                         K=data[1],
+                                         K=sample.K,
                                          scenario_size=scenario_size)
                 return loss
 

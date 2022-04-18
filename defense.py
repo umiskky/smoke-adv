@@ -30,9 +30,9 @@ def main(args):
     pipeline.stickers.patch = "data/results/2022-03-28-17-07/visualization/patch/00270_000.49891_patch.pth"
     step = 0
     loss = None
-    for _, data in enumerate(pipeline.dataset.data):
+    for _, sample in enumerate(pipeline.dataset.data_raw):
         try:
-            loss = pipeline.forward(data)
+            loss = pipeline.forward(sample)
         except KeyboardInterrupt:
             print("Stop Attack Manually!")
             logger.close_logger()
@@ -41,7 +41,7 @@ def main(args):
             loss = torch.tensor(0)
         _step_loss = loss.clone().cpu().item() * -1
         # # Visualization Pipeline
-        pipeline.visualization.vis(scenario_index=data[0],
+        pipeline.visualization.vis(scenario_index=sample.scenario_index,
                                    epoch=0,
                                    step=step,
                                    scenario=pipeline.scenario,

@@ -74,13 +74,13 @@ def main(args):
         pipeline.visualization.epoch = epoch
         # Init for new epoch
         _epoch_loss = 0
-        dataset = pipeline.dataset.generate()
-        for _, data in enumerate(dataset):
+        dataset = pipeline.dataset.train_data
+        for _, sample in enumerate(dataset):
             # Sync visualization step
             pipeline.visualization.step = step
             try:
                 with time_block("Forward & Backward & Step"):
-                    loss = pipeline.forward(data)
+                    loss = pipeline.forward(sample)
                     if loss is not None:
                         loss.backward()
                     pgd.record()
@@ -96,7 +96,7 @@ def main(args):
                 step_loss_list.append(_step_loss)
                 # # Visualization Pipeline
                 with time_block("Vis"):
-                    pipeline.visualization.vis(scenario_index=data[0],
+                    pipeline.visualization.vis(scenario_index=sample.scenario_index,
                                                scenario=pipeline.scenario,
                                                renderer=pipeline.renderer,
                                                stickers=pipeline.stickers,
@@ -146,5 +146,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
-    # with torch.autograd.set_detect_anomaly(True):
     main(args)

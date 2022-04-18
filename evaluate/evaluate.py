@@ -38,12 +38,12 @@ def main(args):
 
     # Sync visualization epoch
     pipeline.visualization.epoch = epoch
-    dataset = pipeline.dataset.generate()
-    for _, data in enumerate(dataset):
+    dataset = pipeline.dataset.eval_data
+    for _, sample in enumerate(dataset):
         # Sync visualization step
         pipeline.visualization.step = step
         try:
-            loss = pipeline.forward(data)
+            loss = pipeline.forward(sample)
         except KeyboardInterrupt:
             print("Stop Attack Manually!")
             logger.close_logger()
@@ -53,7 +53,8 @@ def main(args):
         _step_loss = loss.clone().cpu().item() * -1
         _epoch_loss += _step_loss
         # # Visualization Pipeline
-        pipeline.visualization.vis(scenario_index=data[0],
+        # TODO
+        pipeline.visualization.vis(scenario_index=sample,
                                    scenario=pipeline.scenario,
                                    renderer=pipeline.renderer,
                                    stickers=pipeline.stickers,

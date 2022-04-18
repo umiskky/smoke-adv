@@ -39,6 +39,8 @@ object:
   obj_path: "data/objects/man/man.obj"
   # model size(m) [x, y, z] = [w, h, l]
   size: [0.55, 1.86, 0.48]
+  # using the axis from camera to 3d object as z-axis instead of one in the world coordinate
+  rotation_relative: false
 
 stickers:
   type: "hls"
@@ -63,8 +65,8 @@ renderer:
     quality_rate: 1
     background_color: [ 0.0, 0.0, 0.0 ]
     image_shape: [1920, 1280]
-    sigma: 1e-4
-    gamma: 1e-4
+    sigma: 1e-6
+    gamma: 1e-6
 
 defense:
   # Support Types: ["BitDepth", "MedianBlur", "GaussianBlur", "JpegCompression"]

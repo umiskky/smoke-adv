@@ -215,33 +215,33 @@ class Visualization:
             d_texture = (texture_perturb - texture_raw).permute(2, 0, 1)
 
             # L1 norm
-            l1_norm = torch.norm(d_texture, p=1, dim=[1, 2])
-            r_l1_norm, g_l1_norm, b_l1_norm = \
-                torch.split(l1_norm, split_size_or_sections=1, dim=0)
-            rgb_l1_norm = torch.norm(d_texture, p=1)
-            metrics["r_l1_norm"] = r_l1_norm
-            metrics["g_l1_norm"] = g_l1_norm
-            metrics["b_l1_norm"] = b_l1_norm
+            # l1_norm = torch.norm(d_texture, p=1, dim=[1, 2])
+            # r_l1_norm, g_l1_norm, b_l1_norm = \
+            #     torch.split(l1_norm, split_size_or_sections=1, dim=0)
+            rgb_l1_norm = torch.mean(torch.norm(d_texture, p=1, dim=0))
+            # metrics["r_l1_norm"] = r_l1_norm
+            # metrics["g_l1_norm"] = g_l1_norm
+            # metrics["b_l1_norm"] = b_l1_norm
             metrics["rgb_l1_norm"] = rgb_l1_norm
 
             # frobenius norm
-            frobenius_norm = torch.norm(d_texture, p='fro', dim=[1, 2])
-            r_frobenius_norm, g_frobenius_norm, b_frobenius_norm = \
-                torch.split(frobenius_norm, split_size_or_sections=1, dim=0)
-            rgb_frobenius_norm = torch.norm(d_texture, p='fro')
-            metrics["r_frobenius_norm"] = r_frobenius_norm
-            metrics["g_frobenius_norm"] = g_frobenius_norm
-            metrics["b_frobenius_norm"] = b_frobenius_norm
+            # frobenius_norm = torch.norm(d_texture, p='fro', dim=[1, 2])
+            # r_frobenius_norm, g_frobenius_norm, b_frobenius_norm = \
+            #     torch.split(frobenius_norm, split_size_or_sections=1, dim=0)
+            rgb_frobenius_norm = torch.mean(torch.norm(d_texture, p='fro', dim=0))
+            # metrics["r_frobenius_norm"] = r_frobenius_norm
+            # metrics["g_frobenius_norm"] = g_frobenius_norm
+            # metrics["b_frobenius_norm"] = b_frobenius_norm
             metrics["rgb_frobenius_norm"] = rgb_frobenius_norm
 
             # inf norm
-            inf_norm = torch.norm(d_texture, p=float('inf'), dim=[1, 2])
-            r_inf_norm, g_inf_norm, b_inf_norm = \
-                torch.split(inf_norm, split_size_or_sections=1, dim=0)
-            rgb_inf_norm = torch.norm(d_texture, p=float('inf'))
-            metrics["r_inf_norm"] = r_inf_norm
-            metrics["g_inf_norm"] = g_inf_norm
-            metrics["b_inf_norm"] = b_inf_norm
+            # inf_norm = torch.norm(d_texture, p=float('inf'), dim=[1, 2])
+            # r_inf_norm, g_inf_norm, b_inf_norm = \
+            #     torch.split(inf_norm, split_size_or_sections=1, dim=0)
+            rgb_inf_norm = torch.mean(torch.norm(d_texture, p=float('inf'), dim=0))
+            # metrics["r_inf_norm"] = r_inf_norm
+            # metrics["g_inf_norm"] = g_inf_norm
+            # metrics["b_inf_norm"] = b_inf_norm
             metrics["rgb_inf_norm"] = rgb_inf_norm
 
             self._logger_comet.log_metrics(metrics, epoch=self._epoch)

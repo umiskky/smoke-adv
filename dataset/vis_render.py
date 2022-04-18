@@ -19,10 +19,10 @@ def main_pipe(args):
     pipeline = Pipeline(cfg)
 
     # dataset = pipeline.dataset.generate()
-    dataset = pipeline.dataset.data
+    dataset = pipeline.dataset.data_raw
     step = 0
     pipeline.visualization.epoch = 0
-    for _, data in enumerate(dataset):
+    for _, sample in enumerate(dataset):
 
         # ========================== Verbose 1 ==========================
         # Color Temperature Table
@@ -32,7 +32,7 @@ def main_pipe(args):
         color_table2.field_names = ["~60%", "~70%", "~80%", "~90%"]
         phi_list = [0.22, 0.04, -0.14, -0.32, -0.5, -0.68, -0.86, -1.04, -1.22]
         temperature_list = []
-        scenario, _ = pipeline.scenario.forward(data[0])
+        scenario, _ = pipeline.scenario.forward(sample.scenario_index)
         for phi in phi_list:
             color_t = ColorTemperature(phi=phi)
             temperature = color_t.calculate_temperature(ColorTemperature.transform_image(scenario))
@@ -45,7 +45,7 @@ def main_pipe(args):
 
         pipeline.visualization.step = step
         try:
-            box3d_branch, box_pseudo_gt = pipeline.forward(data)
+            box3d_branch, box_pseudo_gt = pipeline.forward(sample)
             box3d_branch_target_filtered = getattr(Loss, "_filter_with_target")(box3d_branch=box3d_branch,
                                                                                 targets=[1, 2])
             box3d_branch_3d_radius_filtered = getattr(Loss, "_filter_with_3d_radius")(box3d_branch=box3d_branch_target_filtered,
@@ -55,9 +55,9 @@ def main_pipe(args):
 
             # ========================== Verbose 2 ==========================
             if box3d_branch_filter is None:
-                print("{0} scenario false to detection!".format(data[0]))
+                print("{0} scenario false to detection!".format(sample.scenario_index))
                 # Visualization Pipeline
-                pipeline.visualization.vis(scenario_index=data[0],
+                pipeline.visualization.vis(scenario_index=sample.scenario_index,
                                            scenario=pipeline.scenario,
                                            renderer=pipeline.renderer,
                                            stickers=pipeline.stickers,
@@ -68,7 +68,7 @@ def main_pipe(args):
             _, indices = torch.sort(box3d_branch_filter[:, -1], dim=0, descending=True, stable=True)
             indices = torch.flatten(indices)
             # print title
-            print("%s scenario:" % data[0])
+            print("%s scenario:" % sample.scenario_index)
             table = PrettyTable()
             table.field_names = ["Index", "Type", "Width", "Height", "Length",
                                  "Location_x", "Location_y", "Location_z", "Score"]
@@ -102,7 +102,7 @@ def main_pipe(args):
             # ===============================================================
 
             # Visualization Pipeline
-            pipeline.visualization.vis(scenario_index=data[0],
+            pipeline.visualization.vis(scenario_index=sample.scenario_index,
                                        scenario=pipeline.scenario,
                                        renderer=pipeline.renderer,
                                        stickers=pipeline.stickers,
@@ -122,7 +122,7 @@ def parse_args():
         "--config",
         "-f",
         dest="cfg",
-        default="./config.yaml",
+        default="./render_config.yaml",
         help="The config file path.",
         required=False,
         type=str)

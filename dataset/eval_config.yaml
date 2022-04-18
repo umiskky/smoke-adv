@@ -5,8 +5,7 @@ global:
   device: "cuda:0"
 
 dataset:
-#  meta: "evaluate/pipe/meta.yaml"
-  meta: "data/config/meta_eval.yaml"
+  meta: "dataset/meta.yaml"
 
 enable:
   object: true
@@ -18,13 +17,16 @@ enable:
   attack: false
   logger: true
 
+object:
+  rotation_relative: true
+
 logger:
   common:
       confidence_threshold: 0.25
   local:
-    vis_plt: true
+    vis_plt: false
 #    plt_content: ["scenario", "render_bg", "render_scenario", "detection_2d", "detection_3d"]
-    plt_content: ["detection_2d", "detection_3d"]
+    plt_content: ["detection_3d"]
     vis_offline: false
     off_dir: "data/results/test/"
     off_content: ["render_scenario", "detection_2d", "detection_3d"]

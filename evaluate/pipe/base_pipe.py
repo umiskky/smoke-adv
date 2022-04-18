@@ -10,15 +10,15 @@ def main_pipe(args):
     pipeline = Pipeline(cfg)
 
     # dataset = pipeline.dataset.generate()
-    dataset = pipeline.dataset.data
+    dataset = pipeline.dataset.data_raw
     step = 0
     pipeline.visualization.epoch = 0
-    for _, data in enumerate(dataset):
+    for _, sample in enumerate(dataset):
         pipeline.visualization.step = step
         try:
-            pipeline.forward(data)
+            pipeline.forward(sample)
             # Visualization Pipeline
-            pipeline.visualization.vis(scenario_index=data[0],
+            pipeline.visualization.vis(scenario_index=sample.scenario_index,
                                        scenario=pipeline.scenario,
                                        renderer=pipeline.renderer,
                                        stickers=pipeline.stickers,

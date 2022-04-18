@@ -16,7 +16,7 @@ enable:
   logger: true
 
 dataset:
-  meta: "data/config/meta_5.yaml"
+  meta: "data/config/meta_train.yaml"
   random:
     frequency: 1
     # random rotation
@@ -26,7 +26,7 @@ dataset:
       times: 8
     # random translate
     translate:
-      enable: true
+      enable: false
       lateral: [ -0.05, 0.05 ]
       longitudinal: [ -0.05, 0.05 ]
 
@@ -60,10 +60,10 @@ logger:
       confidence_threshold: 0.10
   comet:
     enable: true
-    test: false
+    test: true
     vis_content: ["detection_2d"]
   local:
-    vis_offline: true
+    vis_offline: false
     off_content: ["patch", "texture", "detection_2d", "detection_3d"]
     patch_save_frequency: 1
     off_dir: "data/results/train"

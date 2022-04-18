@@ -1,0 +1,1217 @@
+# ====================================================
+# meta.yaml is used to save scenarios indexes,
+# 3D object's transform and its corresponding render parameters.
+# scale can be a float type num or []
+# rotation can be None or [] or [[], ...]
+# translate must be [[], ...]
+# others can be [] or [[], ...]
+# ====================================================
+# 1
+"0402018":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.45, 10 ]
+  light:
+    ambient_color: [ 87, 71, 72 ]
+    diffuse_color: [ 252, 224, 212 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -4, 7 ]
+
+"0402197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.5, -0.10, 15 ]
+  light:
+    ambient_color: [ 87, 71, 72 ]
+    diffuse_color: [ 252, 224, 212 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -0.5, -4, 12 ]
+
+"0403073":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 4.5, -0.25, 15 ]
+  light:
+    ambient_color: [ 94, 111, 131 ]
+    diffuse_color: [ 102, 114, 131 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -0.5, -5, 20 ]
+
+"0403184":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.3, 14 ]
+  light:
+    ambient_color: [ 150, 153, 180 ]
+    diffuse_color: [ 15, 15, 18 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -5, -10, 8 ]
+
+"0404122":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0, -0.20, 12 ]
+  light:
+    ambient_color: [ 151, 158, 177 ]
+    diffuse_color: [ 242, 208, 177 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -10, 6 ]
+
+"0404198":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.10, 16 ]
+  light:
+    ambient_color: [ 143, 150, 168 ]
+    diffuse_color: [ 242, 208, 177 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -5, -10, 12 ]
+
+"0405044":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.12, 15 ]
+  light:
+    ambient_color: [ 154, 154, 167 ]
+    diffuse_color: [ 220, 184, 138 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -30, -150, 50 ]
+
+"0405082":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3.5, -0.15, 12 ]
+  light:
+    ambient_color: [ 154, 154, 167 ]
+    diffuse_color: [ 220, 184, 138 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -30, -1500, 40 ]
+
+"0409062":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.5, -0.2, 12 ]
+  light:
+    ambient_color: [ 111, 111, 121 ]
+    diffuse_color: [ 255, 228, 196 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -30, -30, 14 ]
+
+"0409069":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3.5, -0.1, 15 ]
+  light:
+    ambient_color: [ 111, 111, 121 ]
+    diffuse_color: [ 255, 228, 196 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -30, -30, 14 ]
+
+# 2
+"0410111":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0, -0.2, 15 ]
+  light:
+    ambient_color: [ 114, 111, 109 ]
+    diffuse_color: [ 40, 40, 40 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 30, -30, 14 ]
+
+"0410183":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.2, 10 ]
+  light:
+    ambient_color: [ 114, 111, 109 ]
+    diffuse_color: [ 40, 40, 40 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 30, -30, 9 ]
+
+"0412071":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.25, 14 ]
+  light:
+    ambient_color: [ 0, 0, 0 ]
+    diffuse_color: [ 255, 180, 107 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -2, -3, 6 ]
+
+"0412155":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0, -0.15, 12 ]
+  light:
+    ambient_color: [ 0, 0, 0 ]
+    diffuse_color: [ 255, 180, 107 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, -2, 10 ]
+
+"0417032":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.15, 12 ]
+  light:
+    ambient_color: [ 124, 123, 128 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, -10, 14 ]
+
+"0417073":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.20, 15 ]
+  light:
+    ambient_color: [ 124, 123, 128 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -8, 8 ]
+
+"0418191":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -4, -0.12, 14 ]
+  light:
+    ambient_color: [ 124, 122, 128 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -11, -10, 8 ]
+
+"0418197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.12, 8 ]
+  light:
+    ambient_color: [ 124, 122, 128 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -10, 2 ]
+
+"0419006":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0, -0.1, 13 ]
+  light:
+    ambient_color: [ 50, 50, 50 ]
+    diffuse_color: [ 255, 228, 206 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -4, 0 ]
+
+"0419040":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2.2, -0.3, 12 ]
+  light:
+    ambient_color: [ 65, 65, 65 ]
+    diffuse_color: [ 242, 217, 196 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -10, 0 ]
+
+# 3
+"0421000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.5, -0.05, 12 ]
+  light:
+    ambient_color: [ 103, 105, 115 ]
+    diffuse_color: [ 46, 46, 52 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4.5, -3, 9 ]
+
+"0421071":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1.5, 0.1, 14 ]
+  light:
+    ambient_color: [ 103, 105, 115 ]
+    diffuse_color: [ 46, 46, 52 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4.5, -3, 9 ]
+
+"0422016":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.5, -0.29, 11 ]
+  light:
+    ambient_color: [ 110, 115, 128 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -0.5, -10, 10 ]
+
+"0422083":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.30, 12 ]
+  light:
+    ambient_color: [ 110, 115, 128 ]
+    diffuse_color: [ 85, 85, 85 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 3, -10, 11 ]
+
+"0423000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.15, 12 ]
+  light:
+    ambient_color: [ 153, 159, 182 ]
+    diffuse_color: [ 85, 85, 85 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, -10, 8 ]
+
+"0423102":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.28, 8 ]
+  light:
+    ambient_color: [ 153, 159, 182 ]
+    diffuse_color: [ 70, 70, 70 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 3, -10, 3 ]
+
+"0425001":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3.5, -0.4, 13 ]
+  light:
+    ambient_color: [ 179, 146, 114 ]
+    diffuse_color: [ 217, 178, 139 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -1, 1, 3 ]
+
+"0425158":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2.5, -0.36, 13 ]
+  light:
+    ambient_color: [ 143, 117, 91 ]
+    diffuse_color: [ 179, 146, 114 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, 1, 3 ]
+
+"0427000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, -0.1, 14 ]
+  light:
+    ambient_color: [ 130, 127, 130 ]
+    diffuse_color: [ 230, 224, 228 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 7, -10, 18 ]
+
+"0427186":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.25, 12 ]
+  light:
+    ambient_color: [ 117, 114, 117 ]
+    diffuse_color: [ 230, 224, 228 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -10, 12 ]
+
+# 4
+"0428070":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.26, 10 ]
+  light:
+    ambient_color: [ 113, 112, 115 ]
+    diffuse_color: [ 150, 150, 150 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -7, -10, 16 ]
+
+"0428197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.22, 10 ]
+  light:
+    ambient_color: [ 102, 98, 96 ]
+    diffuse_color: [ 230, 219, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -10, 8 ]
+
+"0433182":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.1, 14 ]
+  light:
+    ambient_color: [ 102, 99, 98 ]
+    diffuse_color: [ 102, 96, 90 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -2, 20 ]
+
+"0433198":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, 0, 14 ]
+  light:
+    ambient_color: [ 128, 120, 117 ]
+    diffuse_color: [ 230, 216, 210 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -5, 15 ]
+
+"0435080":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.25, 12 ]
+  light:
+    ambient_color: [ 167, 173, 191 ]
+    diffuse_color: [ 50, 50, 50 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, -15, 19 ]
+
+"0435148":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, 0, 14 ]
+  light:
+    ambient_color: [ 167, 173, 191 ]
+    diffuse_color: [ 50, 50, 50 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 4, -15, 16 ]
+
+"0437024":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, 0.05, 11 ]
+  light:
+    ambient_color: [ 98, 101, 112 ]
+    diffuse_color: [ 217, 194, 175 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4, -15, 10 ]
+
+"0437087":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.01, 13 ]
+  light:
+    ambient_color: [ 109, 113, 128 ]
+    diffuse_color: [ 70, 70, 70 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4, -15, 10 ]
+
+"0441182":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.24, 13 ]
+  light:
+    ambient_color: [ 120, 124, 141 ]
+    diffuse_color: [ 70, 70, 70 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4, -15, 10 ]
+
+"0441197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.16, 13 ]
+  light:
+    ambient_color: [ 120, 124, 141 ]
+    diffuse_color: [ 80, 80, 80 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, -15, 10 ]
+
+# 5
+"0443063":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.35, 13 ]
+  light:
+    ambient_color: [ 127, 128, 141 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 2, -15, 10 ]
+
+"0443166":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1, -0.05, 13 ]
+  light:
+    ambient_color: [ 127, 128, 141 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 2.5, -10, 10 ]
+
+"0444018":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.12, 13 ]
+  light:
+    ambient_color: [ 128, 122, 120 ]
+    diffuse_color: [ 230, 219, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 2.5, -8, 15 ]
+
+"0444064":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.18, 15 ]
+  light:
+    ambient_color: [ 128, 122, 120 ]
+    diffuse_color: [ 230, 219, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 8.5, -8, 16 ]
+
+"0448025":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.05, 11 ]
+  light:
+    ambient_color: [ 113, 112, 113 ]
+    diffuse_color: [ 203, 201, 203 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4, -8, 8 ]
+
+"0448055":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.04, 14 ]
+  light:
+    ambient_color: [ 120, 120, 123 ]
+    diffuse_color: [ 215, 215, 221 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -8, 10 ]
+
+"0452093":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, -0.3, 16 ]
+  light:
+    ambient_color: [ 128, 139, 152 ]
+    diffuse_color: [ 181, 196, 226 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -1.5, -20, 16 ]
+
+"0452136":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1, -0.3, 14 ]
+  light:
+    ambient_color: [ 128, 139, 152 ]
+    diffuse_color: [ 181, 196, 226 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -20, 13.5 ]
+
+"0455009":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1, -0.17, 14 ]
+  light:
+    ambient_color: [ 118, 119, 120 ]
+    diffuse_color: [ 212, 213, 216 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 5, -20, 5 ]
+
+"0455140":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.2, 14 ]
+  light:
+    ambient_color: [ 118, 119, 120 ]
+    diffuse_color: [ 212, 213, 216 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 7, -20, 5 ]
+
+# 6
+"0458097":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.4, 14 ]
+  light:
+    ambient_color: [ 125, 130, 132 ]
+    diffuse_color: [ 226, 228, 228 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -5, 26 ]
+
+"0458198":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1, -0.22, 13 ]
+  light:
+    ambient_color: [ 125, 130, 132 ]
+    diffuse_color: [ 90, 92, 92 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 15, -10, 23 ]
+
+"0461000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, -0.35, 13 ]
+  light:
+    ambient_color: [ 115, 117, 122 ]
+    diffuse_color: [ 206, 210, 220 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 15, -8, 8 ]
+
+"0461059":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.3, -0.42, 14 ]
+  light:
+    ambient_color: [ 115, 117, 122 ]
+    diffuse_color: [ 206, 210, 220 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 15, -8, 8 ]
+
+"0464027":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2.2, -0.2, 14 ]
+  light:
+    ambient_color: [ 100, 107, 114 ]
+    diffuse_color: [ 178, 190, 202 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -15, 10 ]
+
+"0464077":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.2, -0.12, 14 ]
+  light:
+    ambient_color: [ 100, 107, 114 ]
+    diffuse_color: [ 178, 190, 202 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -18, 8 ]
+
+"0468079":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.2, -0.15, 14 ]
+  light:
+    ambient_color: [ 106, 108, 111 ]
+    diffuse_color: [ 145, 148, 151 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 2, -10, 13 ]
+
+"0468099":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.1, 14 ]
+  light:
+    ambient_color: [ 117, 119, 122 ]
+    diffuse_color: [ 145, 148, 151 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -1.5, -10, 12 ]
+
+"0470126":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.08, 11 ]
+  light:
+    ambient_color: [ 154, 170, 181 ]
+    diffuse_color: [ 108, 119, 127 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -2, -10, 9 ]
+
+"0470140":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.25, 16 ]
+  light:
+    ambient_color: [ 154, 170, 181 ]
+    diffuse_color: [ 108, 119, 127 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -15, 11 ]
+
+# 7
+"0472095":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2.2, -0.15, 15 ]
+  light:
+    ambient_color: [ 114, 142, 155 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -15, 16 ]
+
+"0472135":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.18, 15 ]
+  light:
+    ambient_color: [ 114, 142, 155 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -3, -15, 15 ]
+
+"0473103":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.16, 14 ]
+  light:
+    ambient_color: [ 117, 132, 141 ]
+    diffuse_color: [ 41, 40, 40 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, 0.5, 0 ]
+
+"0473141":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.17, 14 ]
+  light:
+    ambient_color: [ 151, 158, 162 ]
+    diffuse_color: [ 51, 50, 50 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, 0.5, 0 ]
+
+"0476000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, -0.26, 15 ]
+  light:
+    ambient_color: [ 128, 122, 120 ]
+    diffuse_color: [ 230, 219, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -5, 11 ]
+
+"0476054":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3.5, -0.15, 15 ]
+  light:
+    ambient_color: [ 128, 122, 120 ]
+    diffuse_color: [ 230, 219, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -6, 11 ]
+
+"0478009":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 4, -0.35, 14]
+  light:
+    ambient_color: [ 139, 147, 176 ]
+    diffuse_color: [ 70, 70, 70 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 4, -8, 11 ]
+
+"0478161":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.5, -0.25, 16]
+  light:
+    ambient_color: [ 139, 147, 176 ]
+    diffuse_color: [ 80, 80, 80 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -1, -10, 15 ]
+
+"0479094":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1.9, -0.1, 16]
+  light:
+    ambient_color: [ 111, 126, 147 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, -10, 14 ]
+
+"0479195":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -4, -0.25, 14]
+  light:
+    ambient_color: [ 128, 148, 170 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 1, -10, 9 ]
+
+# 8
+"0480011":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, 0.06, 14]
+  light:
+    ambient_color: [ 111, 130, 157 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 3, -10, 13 ]
+
+"0480197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.25, 13]
+  light:
+    ambient_color: [ 111, 130, 157 ]
+    diffuse_color: [ 110, 110, 110 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -1, -10, 12 ]
+
+"0485000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.3, 14]
+  light:
+    ambient_color: [ 139, 135, 156 ]
+    diffuse_color: [ 192, 193, 235 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -4, -10, 10 ]
+
+"0485098":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.22, 14]
+  light:
+    ambient_color: [ 148, 145, 167 ]
+    diffuse_color: [ 195, 194, 232 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, -10, 10 ]
+
+"0486000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 4, -0.31, 15]
+  light:
+    ambient_color: [ 95, 99, 111 ]
+    diffuse_color: [ 238, 236, 242 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 6, -7, 10 ]
+
+"0486057":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 0.5, -0.08, 15]
+  light:
+    ambient_color: [ 92, 105, 128 ]
+    diffuse_color: [ 227, 234, 243 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 8, -8, 11 ]
+
+"0487080":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.01, 15]
+  light:
+    ambient_color: [ 124, 149, 161 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 8, -8, 11 ]
+
+"0487148":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.03, 15]
+  light:
+    ambient_color: [ 126, 148, 162 ]
+    diffuse_color: [ 171, 152, 136 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 8, -8, 13 ]
+
+"0494010":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, 0, 15]
+  light:
+    ambient_color: [ 120, 136, 144 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -8, 14 ]
+
+"0494031":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.1, 15]
+  light:
+    ambient_color: [ 117, 126, 131 ]
+    diffuse_color: [ 120, 120, 120 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -8, 18 ]
+
+# 9
+"0495000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1, -0.14, 14]
+  light:
+    ambient_color: [ 135, 157, 183 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -8, 10 ]
+
+"0495197":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.8, -0.2, 13]
+  light:
+    ambient_color: [ 144, 166, 190 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -8, 10 ]
+
+"0496008":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.5, 0.18, 13.5]
+  light:
+    ambient_color: [ 158, 155, 163 ]
+    diffuse_color: [ 222, 243, 253 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -6, -10, 18 ]
+
+"0496026":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.06, 14]
+  light:
+    ambient_color: [ 158, 155, 163 ]
+    diffuse_color: [ 217, 242, 253 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -10, -10, 18 ]
+
+"0499039":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.20, 14]
+  light:
+    ambient_color: [ 128, 119, 111 ]
+    diffuse_color: [ 230, 214, 200 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 10, -10, 10 ]
+
+"0499064":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.11, 13 ]
+  light:
+    ambient_color: [ 84, 101, 113 ]
+    diffuse_color: [ 147, 137, 128 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 10, -10, 8 ]
+
+"0500000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.22, 15 ]
+  light:
+    ambient_color: [ 111, 115, 121 ]
+    diffuse_color: [ 215, 210, 209 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -20, -15, 8 ]
+
+"0500163":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1.8, -0.22, 16 ]
+  light:
+    ambient_color: [ 111, 115, 121 ]
+    diffuse_color: [ 226, 221, 219 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -15, -9, 6 ]
+
+"0501034":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -2, -0.27, 14.5 ]
+  light:
+    ambient_color: [ 72, 76, 86 ]
+    diffuse_color: [ 166, 176, 186 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -15, -9, 14 ]
+
+"0501130":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 1, -0.3, 13 ]
+  light:
+    ambient_color: [ 63, 70, 79 ]
+    diffuse_color: [ 132, 125, 119 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -15, -9, 15 ]
+
+# 10
+"0507040":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1.5, -0.18, 15 ]
+  light:
+    ambient_color: [ 104, 104, 104 ]
+    diffuse_color: [ 202, 197, 196 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -7, -10, 18 ]
+
+"0507178":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2, -0.12, 14 ]
+  light:
+    ambient_color: [ 90, 91, 92 ]
+    diffuse_color: [ 61, 60, 58 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [-3, -8, 16 ]
+
+"0511083":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -4, 0.02, 12 ]
+  light:
+    ambient_color: [ 115, 108, 118 ]
+    diffuse_color: [ 217, 214, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [10, -10, 11.5 ]
+
+"0511142":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 2.5, -0.26, 13 ]
+  light:
+    ambient_color: [ 93, 115, 130 ]
+    diffuse_color: [ 217, 214, 215 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [10, -10, 15 ]
+
+"0513000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, -0.38, 13 ]
+  light:
+    ambient_color: [ 135, 150, 167 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -5, 10 ]
+
+"0513077":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.23, 14 ]
+  light:
+    ambient_color: [ 135, 150, 167 ]
+    diffuse_color: [ 90, 90, 90 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -2, -5, 10 ]
+
+"0516000":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -3, 0.1, 15 ]
+  light:
+    ambient_color: [ 104, 103, 109 ]
+    diffuse_color: [ 208, 207, 217 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -5, -6, 9 ]
+
+"0516052":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, -0.03, 14 ]
+  light:
+    ambient_color: [ 104, 103, 109 ]
+    diffuse_color: [ 208, 207, 217 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -5, -7, 15 ]
+
+"0524007":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ -1, -0.19, 15 ]
+  light:
+    ambient_color: [ 104, 103, 109 ]
+    diffuse_color: [ 230, 228, 239 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ -8, -7, 13 ]
+
+"0524085":
+  model_matrix:
+    scale: 0.01
+    rotation: [ 0, 0, 0 ]
+    translate:
+      - [ 3, 0, 15 ]
+  light:
+    ambient_color: [ 99, 125, 143 ]
+    diffuse_color: [ 100, 100, 100 ]
+    specular_color: [ 0.0, 0.0, 0.0 ]
+    location: [ 0, -10, 13 ]
