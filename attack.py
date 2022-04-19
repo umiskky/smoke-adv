@@ -45,18 +45,18 @@ def main(args):
 
     pipeline = Pipeline(cfg)
 
-    es = EarlyStop(max_step=60)
+    es = EarlyStop(max_step=500)
     train_flag = True
     epoch = 0
     step = 0
     step_loss_list = []
 
-    pgd = PGDOptimizer(params=[pipeline.stickers.patch],
+    pgd = PGDOptimizer(params={"adv_texture_hls": pipeline.stickers.adv_texture_hls,
+                               "ori_texture_hls": pipeline.stickers.ori_texture_hls,
+                               "mask": pipeline.stickers.mask},
                        alpha=cfg.cfg_attack["optimizer"]["alpha"],
                        clip_min=cfg.cfg_attack["optimizer"]["clip_min"],
                        clip_max=cfg.cfg_attack["optimizer"]["clip_max"],
-                       position=cfg.cfg_stickers["position"],
-                       size=cfg.cfg_stickers["size"],
                        device=cfg.cfg_global["device"])
     sheduler = ReduceLROnPlateau(optimizer=pgd,
                                  mode='min',
@@ -122,19 +122,20 @@ def main(args):
         logger.logger_comet.log_metric("loss_epoch_mean", _epoch_loss / len(dataset), epoch=epoch)
         logger.logger_comet.log_metric("alpha", pgd.super_params.get("alpha"), epoch=epoch)
         # save patch
-        pipeline.visualization.save_patch(_epoch_loss, pipeline.stickers)
+        pipeline.visualization.save_texture(_epoch_loss, pipeline.stickers)
         # eval perturbation norm
         pipeline.visualization.eval_norm(pipeline.object_loader, pipeline.stickers)
-        # check if you can stop training
-        if _epoch_loss <= cfg.cfg_attack["target_score"]:
-            train_flag = False
-        else:
-            train_flag = es.step(_epoch_loss)
+        # # check if you can stop training
+        # if _epoch_loss <= cfg.cfg_attack["target_score"]:
+        #     train_flag = False
+        # else:
+        #     train_flag = es.step(_epoch_loss)
+        train_flag = es.step(_epoch_loss)
 
         # save patch before exit
         if not train_flag:
             # save patch
-            pipeline.visualization.save_patch(_epoch_loss, pipeline.stickers)
+            pipeline.visualization.save_texture(_epoch_loss, pipeline.stickers)
 
         # clear and prepare for the next epoch
         step_loss_list = []

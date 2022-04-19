@@ -57,6 +57,7 @@ class Loss:
         if "score" == self._type:
             res = self._get_score_loss(box3d_branch_filtered)
         elif "2d_iou" == self._type:
+            # TODO
             res = self._get_score_loss(box3d_branch_filtered)
         elif "3d" == self._type:
             res = self._get_3d_gt_loss(box3d_branch_filtered, box_3d_gt=box_pseudo_gt["3d"])

@@ -3,20 +3,16 @@ import torch.nn.functional as F
 
 
 class PGDOptimizer:
-    def __init__(self, params: list, alpha: float = 0.001,
+    def __init__(self, params: dict, alpha: float = 0.001,
                  clip_min: float = 0.01, clip_max: float = 0.1,
-                 position=None, size=None, device="cpu"):
-        if position is None:
-            position = [0, 0]
-        if size is None:
-            size = [1, 1]
+                 device="cpu"):
         if clip_max <= clip_min:
             raise ValueError("Invalid clip: min={}, max={}".format(clip_min, clip_max))
         if alpha < 0.0:
             raise ValueError("Invalid iter eps value: {}".format(alpha))
-        self._super_params = dict(alpha=alpha, clip_min=clip_min, clip_max=clip_max, position=position, size=size)
+        self._super_params = dict(alpha=alpha, clip_min=clip_min, clip_max=clip_max)
         self._params = params
-        self._grad_container = [[] * len(self._params)]
+        self._grad_container = []
         self._device = device
 
     @property
@@ -25,13 +21,14 @@ class PGDOptimizer:
 
     @torch.no_grad()
     def record(self):
-        for param_idx, param in enumerate(self._params):
+        param = self._params.get("adv_texture_hls")
+        if param is not None:
             if param.grad is None:
-                self._grad_container[param_idx].append(0)
+                self._grad_container.append(0)
                 param.requires_grad_(False)
             else:
                 d_param = param.grad
-                self._grad_container[param_idx].append(d_param.clone().cpu())
+                self._grad_container.append(d_param.clone().cpu())
                 param.requires_grad_(False)
 
     @torch.no_grad()
@@ -41,27 +38,22 @@ class PGDOptimizer:
         alpha = self._super_params.get("alpha")
         clip_min = self._super_params.get("clip_min")
         clip_max = self._super_params.get("clip_max")
-        x_l, y_l = self._super_params.get("position")
-        size = self._super_params.get("size")
-        for param_idx, param in enumerate(self._params):
-            if len(self._grad_container[param_idx]) == 0:
-                continue
-            if "softmax" == step_type and step_loss_list is not None:
-                assert isinstance(step_loss_list, list) and len(step_loss_list) == len(self._grad_container[param_idx])
-                d_param = self._softmax(self._grad_container[param_idx], step_loss_list)
-            else:
-                # calculate in cpu to avoid out of memory error
-                d_param = self._mean(self._grad_container[param_idx])
 
-            perturbation = alpha * torch.sign(d_param)
-            perturbation = perturbation.to(self._device)
-            # 1 -> l channel
-            param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] += \
-                perturbation[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]]
-            param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]] = \
-                torch.clamp(param[:, 1, y_l: y_l + size[0], x_l: x_l + size[1]], min=clip_min, max=clip_max)
+        if "softmax" == step_type and step_loss_list is not None:
+            d_param = self._softmax(self._grad_container, step_loss_list)
+        else:
+            # calculate in cpu to avoid out of memory error
+            d_param = self._mean(self._grad_container)
+
+        adv_texture_hls = self._params.get("adv_texture_hls")
+        ori_texture_hls = self._params.get("ori_texture_hls")
+        mask = self._params.get("mask")
+        # PGD
+        new_adv_texture_hls = adv_texture_hls + alpha * mask * torch.sign(d_param.to(self._device))
+        eta = torch.clamp(new_adv_texture_hls - ori_texture_hls, min=clip_min, max=clip_max)
+        adv_texture_hls[:] = ori_texture_hls + mask * eta
         # clear
-        self._grad_container = [[] * len(self._params)]
+        self._grad_container = []
 
     @staticmethod
     def _mean(grad_list: list):

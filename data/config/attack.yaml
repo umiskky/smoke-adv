@@ -18,12 +18,12 @@ enable:
 dataset:
   meta: "data/config/meta_train.yaml"
   random:
-    frequency: 1
+    frequency: 50
     # random rotation
     rotation:
       enable: true
       range: [ 0, 360 ]
-      times: 8
+      times: 1
     # random translate
     translate:
       enable: false
@@ -38,47 +38,46 @@ stickers:
     half_sleeve: "data/objects/man_512/mask_half_sleeve.jpg"
 #    half_sleeve: "data/objects/man_512/mask_half_sleeve_simple.jpg"
 #    jeans: "data/objects/man_512/mask_jeans.jpg"
-  texture: [ 1, 3, 512, 512 ]
-  size: [ 512, 512 ]
-  position: [ 0, 0 ]
+
 
 attack:
   target: ["WALKER", "CYCLIST"]
   target_score: 0.10
   loss:
-    type: "3d_score_mix"
+    type: "score"
     threshold: 0.10
-    iou: 0.2
-    radius: 10
+    iou: 0.15
+    radius: 3
   optimizer:
     alpha: 0.1
-    clip_min: -0.2
-    clip_max: 0.2
+    clip_min: -0.1
+    clip_max: 0.1
 
 logger:
   common:
-      confidence_threshold: 0.10
+      confidence_threshold: 0.25
   comet:
     enable: true
-    test: true
-    vis_content: ["detection_2d"]
+    test: false
+    vis_content: []
   local:
-    vis_offline: false
-    off_content: ["patch", "texture", "detection_2d", "detection_3d"]
+    vis_offline: true
+    off_content: ["adv_texture"]
     patch_save_frequency: 1
     off_dir: "data/results/train"
     vis_plt: false
-##    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
-    plt_content: ["detection_3d"]
+#    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
+    plt_content: [ "texture", "detection_2d"]
 
 # Use for comet.ml experiment results filter, no params are controlled
 tags:
-  scenario_num: 3
-  position_num: 5
+  scenario_num: 1
+  position_num: 1
   texture: 512
   target: ["WALKER", "CYCLIST"]
-  loss_type: "3d_score_mix"
+  loss_type: "score"
   step_type: "softmax"
+  note: "1 angle from 0-360, train 50 times"
 
 
 

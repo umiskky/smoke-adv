@@ -246,17 +246,17 @@ class Visualization:
 
             self._logger_comet.log_metrics(metrics, epoch=self._epoch)
 
-    def save_patch(self, loss_epoch, stickers: TextureSticker):
+    def save_texture(self, loss_epoch, stickers: TextureSticker):
         """Save Patch At a certain frequency"""
         frequency = self._patch_save_frequency
         if self._epoch % frequency == 0:
-            if stickers.patch.requires_grad:
-                save_patch = stickers.patch.detach().clone().cpu()
+            if stickers.adv_texture_hls.requires_grad:
+                save_patch = stickers.adv_texture_hls.detach().clone().cpu()
             else:
-                save_patch = stickers.patch.clone().cpu()
+                save_patch = stickers.adv_texture_hls.clone().cpu()
             # save texture patch
-            if self._enable_vis_offline and "patch" in self._off_content:
-                state_dict = {"patch": save_patch, "epoch": self._epoch, "loss": loss_epoch}
+            if self._enable_vis_offline and "adv_texture" in self._off_content:
+                state_dict = {"adv_texture": save_patch, "epoch": self._epoch, "loss": loss_epoch}
                 state_saving(state=state_dict, epoch=self._epoch, loss=loss_epoch, path=self._offline_dir)
 
     def _init_dir(self, contents: list, exclude=None):
