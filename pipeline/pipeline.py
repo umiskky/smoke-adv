@@ -1,5 +1,3 @@
-import torch.nn as nn
-
 from pipeline.modules.dataset import Dataset
 from pipeline.modules.loss import Loss
 from pipeline.modules.sample import Sample
@@ -13,7 +11,7 @@ from tools.config import Config
 from tools.file_utils import update_dic
 
 
-class Pipeline(nn.Module):
+class Pipeline:
 
     def __init__(self, args: Config):
         super().__init__()

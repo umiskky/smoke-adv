@@ -1,6 +1,6 @@
 import argparse
 
-import evaluate.pipe.base_pipe as tpp
+import evaluate.test_pipe.base_pipe as tpp
 
 
 def parse_args():
@@ -11,7 +11,7 @@ def parse_args():
         "--config",
         "-f",
         dest="cfg",
-        default="./render_stickers_scenario_detection_pipe.yaml",
+        default="./render_scenario_detection_pipe.yaml",
         help="The config file path.",
         required=False,
         type=str)

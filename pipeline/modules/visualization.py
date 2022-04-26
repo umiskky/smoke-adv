@@ -64,9 +64,11 @@ class Visualization:
             self._step = global_step
 
     def vis(self, scenario_index, scenario: Scenario, renderer: Renderer, stickers: TextureSticker,
-            smoke: Smoke):
+            smoke: Smoke, prefix="", suffix=""):
         """
         Vis For Pipeline.\n
+        :param prefix: name.
+        :param suffix: name.
         :param scenario_index: scenario index.
         :param scenario: instance of Scenario.
         :param renderer: instance of Renderer.
@@ -76,18 +78,18 @@ class Visualization:
         """
         # Vis only once
         if self._once:
-            self._vis_scenario(scenario)
+            self._vis_scenario(scenario, prefix, suffix)
             self._once = False
         # Vis every epoch
         if self._new_epoch:
-            self._vis_texture(stickers)
+            self._vis_texture(stickers, prefix, suffix)
             self._new_epoch = False
         # Vis every step
-        self._vis_render_bg(renderer, scenario_index)
-        self._vis_render_scenario(renderer, scenario_index)
-        self._vis_detection(smoke, scenario_index)
+        self._vis_render_bg(renderer, scenario_index, prefix, suffix)
+        self._vis_render_scenario(renderer, scenario_index, prefix, suffix)
+        self._vis_detection(smoke, scenario_index, prefix, suffix)
 
-    def _vis_scenario(self, scenario: Scenario):
+    def _vis_scenario(self, scenario: Scenario, prefix, suffix):
         if scenario is not None and len(scenario.visualization) > 0:
             # 0-255 RGB HWC uint8
             scenario_plot_dict = scenario.visualization.get("scenarios")
@@ -97,13 +99,14 @@ class Visualization:
                 if self._enable_vis_plt and "scenario" in self._plt_content:
                     plot_img(scenario_plot_dict.get(index), "scenario_%s" % index)
                 if self._enable_vis_offline and "scenario" in self._off_content:
-                    saving_path = osp.join(self._offline_dir, "scenario/", "scenario_%s.png" % index)
+                    saving_path = osp.join(self._offline_dir, "scenario/", prefix + "scenario_%s" % index
+                                           + suffix + ".png")
                     save_img(scenario_plot_dict.get(index), saving_path)
                 if self._enable_comet and "scenario" in self._comet_content:
                     log_img(logger=self._logger_comet, image=scenario_plot_dict.get(index),
                             img_name="scenario_%s" % index, step=-1)
 
-    def _vis_texture(self, stickers: TextureSticker):
+    def _vis_texture(self, stickers: TextureSticker, prefix, suffix):
         frequency = self._patch_save_frequency
         if self._epoch % frequency == 0:
             if stickers is not None and len(stickers.visualization) > 0:
@@ -114,14 +117,16 @@ class Visualization:
                 if self._enable_vis_plt and "texture" in self._plt_content:
                     plot_img(texture_plot, "texture_%04d-epoch" % self._epoch)
                 if self._enable_vis_offline and "texture" in self._off_content:
-                    saving_path = osp.join(self._offline_dir, "texture", "%04d" % self._epoch + "-epoch_texture.png")
+                    saving_path = osp.join(self._offline_dir, prefix + "texture", "%04d" % self._epoch
+                                           + "-epoch_texture"
+                                           + suffix + ".png")
                     save_img(texture_plot, saving_path)
                 if self._enable_comet and "texture" in self._comet_content:
                     log_img(logger=self._logger_comet, image=texture_plot,
                             img_name="%04d" % self._epoch + "-epoch_texture",
                             step=self._epoch)
 
-    def _vis_render_bg(self, renderer: Renderer, scenario_index):
+    def _vis_render_bg(self, renderer: Renderer, scenario_index, prefix, suffix):
         if renderer is not None and len(renderer.visualization) > 0:
             # 0~1.0 RGB HWC float32
             render_bg_plot = renderer.visualization["render_bg"]
@@ -131,7 +136,8 @@ class Visualization:
             if self._enable_vis_plt and "render_bg" in self._plt_content:
                 plot_img(render_bg_plot, "render_bg_" + epoch_step)
             if self._enable_vis_offline and "render_bg" in self._off_content:
-                saving_path = osp.join(self._offline_dir, scenario_index + "_" + epoch_step + "_render_bg.png")
+                saving_path = osp.join(self._offline_dir, prefix + scenario_index + "_" + epoch_step + "_render_bg"
+                                       + suffix + ".png")
                 save_img(render_bg_plot, saving_path)
             if self._enable_comet and "render_bg" in self._comet_content:
                 log_img(logger=self._logger_comet,
@@ -139,7 +145,7 @@ class Visualization:
                         img_name=scenario_index + "_" + epoch_step + "_render_bg",
                         step=self._epoch)
 
-    def _vis_render_scenario(self, renderer: Renderer, scenario_index):
+    def _vis_render_scenario(self, renderer: Renderer, scenario_index, prefix, suffix):
         if renderer is not None and len(renderer.visualization) > 0:
             # 0~1.0 RGB HWC float64
             render_scenario_plot = renderer.visualization.get("render_scenario")
@@ -150,7 +156,8 @@ class Visualization:
                 plot_img(render_scenario_plot, "render_scenario_" + epoch_step)
             if self._enable_vis_offline and "render_scenario" in self._off_content:
                 saving_path = osp.join(self._offline_dir, "render_scenario",
-                                       scenario_index + "_" + epoch_step + "_render_scenario.png")
+                                       prefix + scenario_index + "_" + epoch_step + "_render_scenario"
+                                       + suffix + ".png")
                 save_img(render_scenario_plot, saving_path)
             if self._enable_comet and "render_scenario" in self._comet_content:
                 log_img(logger=self._logger_comet,
@@ -158,7 +165,7 @@ class Visualization:
                         img_name=scenario_index + "_" + epoch_step + "_render_scenario",
                         step=self._epoch)
 
-    def _vis_detection(self, smoke: Smoke, scenario_index):
+    def _vis_detection(self, smoke: Smoke, scenario_index, prefix, suffix):
         if self._enable_vis_plt and ("detection_3d" in self._plt_content or "detection_2d" in self._plt_content) \
                 or self._enable_vis_offline and (
                 "detection_3d" in self._off_content or "detection_2d" in self._off_content) \
@@ -184,11 +191,13 @@ class Visualization:
                 if self._enable_vis_offline:
                     if "detection_3d" in self._off_content:
                         saving_path = osp.join(self._offline_dir, "detection_3d",
-                                               scenario_index + "_" + epoch_step + "_detection_3d.png")
+                                               prefix + scenario_index + "_" + epoch_step + "_detection_3d"
+                                               + suffix + ".png")
                         save_img(detection_3d_plot, saving_path)
                     if "detection_2d" in self._off_content:
                         saving_path = osp.join(self._offline_dir, "detection_2d",
-                                               scenario_index + "_" + epoch_step + "_detection_2d.png")
+                                               prefix + scenario_index + "_" + epoch_step + "_detection_2d"
+                                               + suffix + ".png")
                         save_img(detection_2d_plot, saving_path)
                 if self._enable_comet:
                     if "detection_3d" in self._comet_content:

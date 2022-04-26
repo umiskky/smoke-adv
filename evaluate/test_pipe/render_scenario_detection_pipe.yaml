@@ -5,7 +5,7 @@ global:
   device: "cuda:0"
 
 dataset:
-#  meta: "evaluate/pipe/meta.yaml"
+#  meta: "evaluate/test_pipe/meta.yaml"
   meta: "data/config/meta_eval.yaml"
 
 enable:

@@ -41,6 +41,15 @@ class TextureSticker:
             adv_texture = state.get("adv_texture")
             self._adv_texture_hls = adv_texture.to(self._device)
 
+    def apply_gauss_perturb(self, clip_min=0.01, clip_max=0.1):
+        """Apply normal perturb to ori texture."""
+        ori_texture_hls = self._ori_texture_hls.clone()
+        random = torch.rand(ori_texture_hls.shape, device=ori_texture_hls.device)
+        random: torch.Tensor = torch.add(torch.mul(random, clip_max - clip_min), clip_min)
+        random = torch.clamp(random, min=clip_min, max=clip_max)
+        adv_texture_hls = ori_texture_hls + self._mask * random
+        self._adv_texture_hls = adv_texture_hls
+
     @property
     def ori_texture_hls(self):
         return self._ori_texture_hls.clone()

@@ -45,7 +45,7 @@ def main(args):
 
     pipeline = Pipeline(cfg)
 
-    es = EarlyStop(max_step=500)
+    es = EarlyStop(max_step=200, eps=1e-3)
     train_flag = True
     epoch = 0
     step = 0
@@ -59,12 +59,12 @@ def main(args):
                        clip_max=cfg.cfg_attack["optimizer"]["clip_max"],
                        device=cfg.cfg_global["device"])
     sheduler = ReduceLROnPlateau(optimizer=pgd,
-                                 mode='min',
-                                 factor=0.2,
-                                 patience=10,
-                                 threshold=1e-4,
+                                 mode='max',
+                                 factor=0.1,
+                                 patience=50,
+                                 threshold=1e-3,
                                  threshold_mode='rel',
-                                 cooldown=5,
+                                 cooldown=10,
                                  min_lr=0,
                                  eps=1e-8,
                                  verbose=False)
@@ -105,11 +105,12 @@ def main(args):
                 print("epoch: %04d" % epoch + "   " + "step: %04d" % step + "   " + "step_loss: %.10f" % _step_loss)
                 # log
                 logger.logger_comet.log_metric("loss_step", _step_loss, step=step)
+                logger.logger_comet.log_metric("success_rate", pipeline.loss.success_rate, step=step)
                 # clear and prepare for the next step
                 step += 1
         # update patch
         pgd.step(step_type="softmax", step_loss_list=step_loss_list)
-        sheduler.step(_epoch_loss / len(dataset))
+        sheduler.step(pipeline.loss.success_rate)
         # print to terminal
         print("==============================================================")
         print("epoch: %04d" % epoch +
@@ -130,7 +131,7 @@ def main(args):
         #     train_flag = False
         # else:
         #     train_flag = es.step(_epoch_loss)
-        train_flag = es.step(_epoch_loss)
+        train_flag = es.step(-1 * pipeline.loss.success_rate)
 
         # save patch before exit
         if not train_flag:

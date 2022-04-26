@@ -1,11 +1,11 @@
 base: "data/config/base.yaml"
 
 global:
-  project_path: "/home/dingxl/workspace/smoke-adv/"
+  project_path: "/home/dingxl/nfs/workspace/smoke-adv/"
   device: "cuda:0"
 
 dataset:
-  meta: "evaluate/pipe/meta.yaml"
+  meta: "evaluate/test_pipe/meta.yaml"
 #  meta: "data/config/meta_eval.yaml"
 
 object:

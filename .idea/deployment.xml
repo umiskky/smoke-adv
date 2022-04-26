@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="dingxl@101.6.68.75:10100 agent" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="dingxl@eoe2:22 agent" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
     <serverData>
       <paths name="dingxl@101.6.68.75:10100">
         <serverdata>
@@ -24,6 +24,23 @@
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="dingxl@cvlab2:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+      <paths name="dingxl@eoe2:22 agent">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

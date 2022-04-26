@@ -56,6 +56,7 @@ def main_pipe(args):
                     # sort detection results by score
                     _, indices = torch.sort(box3d_branch_filter[:, -1], dim=0, descending=True, stable=True)
                     indices = torch.flatten(indices)
+                    # Get max score item
                     prediction = box3d_branch_filter[indices[0], :]
                     # Record Prediction
                     metric.class_type = prediction[0].int().item()

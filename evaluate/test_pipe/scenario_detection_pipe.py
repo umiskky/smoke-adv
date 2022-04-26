@@ -1,6 +1,6 @@
 import argparse
 
-from evaluate.pipe.base_pipe import main_pipe
+from evaluate.test_pipe.base_pipe import main_pipe
 
 
 def parse_args():
