@@ -14,16 +14,6 @@ class Loss:
     def __init__(self, args: dict) -> None:
         self._device = args["device"]
         self._type = args["loss"]["type"]
-        self._threshold = float(args["loss"]["threshold"])
-        self._iou = float(args["loss"]["iou"])
-        self._radius = float(args["loss"]["radius"])
-        self._target = []
-        targets = args["target"]
-        if isinstance(targets, list):
-            for target in targets:
-                self._target.append(self.target_map.get(target))
-        elif isinstance(targets, str):
-            self._target.append(targets)
         # Metric
         self._attack_num = 0
         self._success_num = 0
@@ -33,20 +23,12 @@ class Loss:
     def success_rate(self):
         return self._success_rate
 
-    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor, smoke=None, K=None, scenario_size=None):
+    def forward(self, box_pseudo_gt: dict, box3d_branch: torch.Tensor, smoke=None):
         res = None
-        box3d_branch_target_filtered = self._filter_with_target(box3d_branch, self._target)
-        box3d_branch_score_filtered = self._filter_with_threshold(box3d_branch_target_filtered, self._threshold)
-        box3d_branch_3d_radius_filtered = self._filter_with_3d_radius(box3d_branch_score_filtered,
-                                                                      box_3d_gt=box_pseudo_gt["3d"],
-                                                                      radius=self._radius)
-        box3d_branch_filtered = self._filter_with_2d_iou(box3d_branch_3d_radius_filtered, box_pseudo_gt["2d"],
-                                                         self._iou)
-
         # ========================================= Debug =========================================
         if bool(os.getenv("debug")) and smoke is not None:
-            box3d_branch_debug = box3d_branch_filtered.detach().clone().cpu() if box3d_branch_filtered.requires_grad \
-                else box3d_branch_filtered.clone().cpu()
+            box3d_branch_debug = box3d_branch.detach().clone().cpu() if box3d_branch.requires_grad \
+                else box3d_branch.clone().cpu()
             obstacle_list = Obstacle.decode(box3d_branch_data=box3d_branch_debug,
                                             k=smoke.visualization.get("K"),
                                             confidence_score=0,
@@ -62,8 +44,8 @@ class Loss:
 
         # ========================================= Metric ========================================
         with torch.no_grad():
-            box3d_branch_metric = box3d_branch_target_filtered.detach().clone().cpu() if box3d_branch_target_filtered.requires_grad \
-                else box3d_branch_target_filtered.clone().cpu()
+            box3d_branch_metric = box3d_branch.detach().clone().cpu() if box3d_branch.requires_grad \
+                else box3d_branch.clone().cpu()
             if box3d_branch_metric is not None:
                 box3d_branch_metric_filtered = self._filter_with_3d_radius(box3d_branch_metric,
                                                                            box_3d_gt=box_pseudo_gt["3d"],
@@ -85,17 +67,12 @@ class Loss:
             self._success_rate = self._success_num / self._attack_num
         # =========================================================================================
 
-        if box3d_branch_filtered is None or box3d_branch_filtered.shape[0] <= 0:
+        if box3d_branch is None or box3d_branch.shape[0] <= 0:
             return None
         if "score" == self._type:
-            res = self._get_score_loss(box3d_branch_filtered)
-        elif "3d" == self._type:
-            res = self._get_3d_gt_loss(box3d_branch_filtered, box_3d_gt=box_pseudo_gt["3d"])
-        elif "3d_score_mix" == self._type:
-            res = self._get_score_loss(box3d_branch_filtered) + \
-                  self._get_3d_gt_loss(box3d_branch_filtered, box_3d_gt=box_pseudo_gt["3d"])
+            res = self._get_score_loss(box3d_branch)
         elif "3d_weighted_score" == self._type:
-            res = self._get_3d_weighted_score(box3d_branch_filtered, box_3d_gt=box_pseudo_gt["3d"])
+            res = self._get_3d_weighted_score(box3d_branch, box_3d_gt=box_pseudo_gt["3d"])
         return res
 
     @staticmethod
@@ -109,10 +86,6 @@ class Loss:
             return None
         loss = torch.max(box3d_branch[:, -1]) * -1
         return loss
-
-    @staticmethod
-    def _get_2d_gt_iou_loss(box3d_branch: torch.Tensor, iou_threshold: float, box_2d_gt):
-        pass
 
     @classmethod
     def _get_3d_weighted_score(cls, box3d_branch: torch.Tensor, box_3d_gt):
@@ -147,46 +120,13 @@ class Loss:
         prob_obj_softmax = torch.softmax(torch.sum(prob_log, dim=1), dim=0)
 
         score = torch.flatten(box3d_branch[:, -1])
+        # weight class loss
+        cls_type = torch.flatten(box3d_branch[:, 0])
+        target = 2
+        prob_class_softmax = torch.softmax(-torch.square(torch.sub(cls_type, target)), dim=0)
 
-        loss = -1 * torch.sum(prob_obj_softmax * score)
+        loss = -1 * torch.sum(prob_class_softmax * prob_obj_softmax * score)
         return loss
-
-    @staticmethod
-    def _get_3d_gt_loss(box3d_branch: torch.Tensor, box_3d_gt):
-        device = box3d_branch.device
-
-        # prepare 3d gt information
-        box_3d_gt_location = box_3d_gt.get('location')
-        box_3d_gt_dimensions = box_3d_gt.get('dimensions')
-        h_offset = box_3d_gt.get('h_offset')
-        if h_offset is not None:
-            box_3d_gt_location[1] += h_offset
-        if isinstance(box_3d_gt_location, list):
-            box_3d_gt_location = torch.tensor(box_3d_gt_location, device=device)
-        else:
-            box_3d_gt_location = box_3d_gt_location.to(device)
-        if isinstance(box_3d_gt_dimensions, list):
-            box_3d_gt_dimensions = torch.tensor(box_3d_gt_dimensions, device=device)
-        else:
-            box_3d_gt_dimensions = box_3d_gt_dimensions.to(device)
-        # w, h, l -> h, l, w
-        box_3d_gt_dimensions = torch.roll(box_3d_gt_dimensions, shifts=2, dims=0)
-
-        # calculate weight
-        score = box3d_branch[:, -1]
-        weight = F.softmax(score, dim=0)
-
-        dimensions_loss = F.l1_loss(input=box3d_branch[:, 6:9],
-                                    target=box_3d_gt_dimensions.expand(box3d_branch.shape[0], 3),
-                                    reduction='none')
-        dimensions_loss = torch.sum(dimensions_loss, dim=1)
-        location_loss = F.l1_loss(input=box3d_branch[:, 9:12],
-                                  target=box_3d_gt_location.expand(box3d_branch.shape[0], 3),
-                                  reduction='none')
-        location_loss = torch.sum(location_loss, dim=1)
-        loss = torch.mul(dimensions_loss + location_loss, weight.unsqueeze(1))
-        loss = torch.sum(loss)
-        return 1 / (loss + 1.0) * -1
 
     @staticmethod
     def _filter_with_threshold(box3d_branch: torch.Tensor, threshold: float):

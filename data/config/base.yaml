@@ -96,17 +96,19 @@ smoke:
     shape_feat: [ 1, 64, 160, 240 ]
 
 attack:
-  target: "WALKER"
   target_score: 0.0
   loss:
     type: "score"
-    threshold: 0.25
-    iou: 0.05
-    radius: 3.0
   optimizer:
     alpha: 0.0002
     clip_min: -0.001
     clip_max: 0.001
+
+eval:
+  texture_hls_path: "data/results/train"
+  raw_eval_path: "data/results/eval/raw"
+  attack_eval_path: "data/results/eval/attack"
+  gn_eval_path: "data/results/eval/gn"
 
 logger:
    # ============= Common Vis Settings =============

@@ -45,7 +45,7 @@ def main(args):
 
     pipeline = Pipeline(cfg)
 
-    es = EarlyStop(max_step=200, eps=1e-3)
+    es = EarlyStop(max_step=180, eps=1e-3)
     train_flag = True
     epoch = 0
     step = 0
@@ -61,7 +61,7 @@ def main(args):
     sheduler = ReduceLROnPlateau(optimizer=pgd,
                                  mode='max',
                                  factor=0.1,
-                                 patience=50,
+                                 patience=60,
                                  threshold=1e-3,
                                  threshold_mode='rel',
                                  cooldown=10,

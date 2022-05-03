@@ -2,8 +2,6 @@ base: "data/config/base.yaml"
 
 global:
   project_path: "/home/dingxl/nfs/workspace/smoke-adv/"
-  device: "cuda:0"
-  debug: false
 
 enable:
   object: true
@@ -23,12 +21,7 @@ dataset:
     rotation:
       enable: true
       range: [ 0, 360 ]
-      times: 20
-    # random translate
-    translate:
-      enable: false
-      lateral: [ -0.05, 0.05 ]
-      longitudinal: [ -0.05, 0.05 ]
+      times: 36
 
 object:
   obj_path: "data/objects/man_512/man.obj"
@@ -36,21 +29,15 @@ object:
 stickers:
   mask:
     half_sleeve: "data/objects/man_512/mask_half_sleeve.jpg"
-#    half_sleeve: "data/objects/man_512/mask_half_sleeve_simple.jpg"
     jeans: "data/objects/man_512/mask_jeans.jpg"
 
 
 attack:
-#  target: ["WALKER", "CYCLIST"]
-  target: [""]
-#  target_score: 0.10
   loss:
-    type: "3d_weighted_score"
-    threshold: -1
-    iou: -1
-    radius: -1
+#    type: "3d_weighted_score"
+    type: "score"
   optimizer:
-    alpha: 0.1
+    alpha: 0.15
     clip_min: -0.1
     clip_max: 0.1
 
@@ -59,27 +46,24 @@ logger:
       confidence_threshold: 0.25
   comet:
     enable: true
-    test: true
+    test: false
     vis_content: []
   local:
-    vis_offline: false
+    vis_offline: true
 #    off_content: ["adv_texture", "detection_2d", "detection_3d"]
     off_content: ["adv_texture", "texture"]
     patch_save_frequency: 1
     off_dir: "data/results/train"
-    vis_plt: false
-#    plt_content: [ "scenario", "texture", "render_bg", "render_scenario", "detection_2d", "detection_3d" ]
-    plt_content: [ "texture", "detection_2d"]
 
 # Use for comet.ml experiment results filter, no params are controlled
 tags:
   scenario_num: 20
   position_num: 20
   texture: 512
-  target: ["WALKER", "CYCLIST"]
-  loss_type: "3d_weighted_score"
+  target: []
+  loss_type: "score"
   step_type: "softmax"
-  note: "20 angle from 0-360, train 20 times"
+  note: "36 angle from 0-360, train 20 times"
 
 
 

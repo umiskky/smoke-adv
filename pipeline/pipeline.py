@@ -79,9 +79,6 @@ class Pipeline:
         # =====================================================
 
     def forward(self, sample: Sample):
-        """ data
-        [scenario_idx, K, scale, rotation, translate(list), ambient_color, diffuse_color, specular_color, location]
-        """
         # Init
         scenario = scenario_size = mesh = texture = synthesis_img = box3d_branch = loss = None
         box_pseudo_gt = {}
@@ -107,9 +104,7 @@ class Pipeline:
             if self.loss is not None:
                 loss = self.loss.forward(box_pseudo_gt=box_pseudo_gt,
                                          box3d_branch=box3d_branch,
-                                         smoke=self.smoke,
-                                         K=sample.K,
-                                         scenario_size=scenario_size)
+                                         smoke=self.smoke)
                 return loss
 
         # Result Setting

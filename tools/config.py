@@ -133,5 +133,9 @@ class Config:
     def cfg_logger(self):
         return self._dic["logger"]
 
+    @property
+    def cfg_eval(self):
+        return self._dic["eval"]
+
     def __str__(self):
         return yaml.dump(self._dic)

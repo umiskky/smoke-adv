@@ -11,6 +11,8 @@ class Metric(object):
 
     type_map = {0: "Car", 1: "Cyclist", 2: "Walker", -1: "None"}
 
+    status_map = {0: "normal", 1: "class", 2: "score", 3: "location", -1: "init"}
+
     def __init__(self) -> None:
         # ground truth
         self._sample = None
@@ -26,6 +28,7 @@ class Metric(object):
         self._location_delta = None
         self._dimension_delta = None
         self._iou_2d = -1
+        self._status = -1
 
     @property
     def sample(self):
@@ -91,7 +94,7 @@ class Metric(object):
             raise ValueError("Wrong location_pred type.")
 
         # calculate metric
-        np_location_gt = np.array(self.sample.location)
+        np_location_gt = np.array(self._sample.location)
         np_location_pred = np.array(self._location_pred)
         np_location_delta = np_location_pred - np_location_gt
         self._location_delta = np_location_delta.tolist()
@@ -141,4 +144,15 @@ class Metric(object):
     @property
     def iou_2d(self):
         return self._iou_2d
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, status_):
+        if status_ in self.status_map.keys():
+            self._status = status_
+        else:
+            raise ValueError("Invalid status.")
 

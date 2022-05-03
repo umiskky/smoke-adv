@@ -33,9 +33,20 @@ class Visualization:
         self._off_content = args["local"]["off_content"]
         self._patch_save_frequency = args["local"]["patch_save_frequency"]
 
+        # step & epoch
+        self._step = -1
+        self._epoch = -1
+        # enable for figure plot only once
+        self._once = True
+        # enable for figure plot every new epoch
+        self._new_epoch = False
+
+    def reset(self, offline_dir_):
+        """Using for evaluate visualization"""
+        self._offline_dir = offline_dir_
         if self._enable_vis_offline:
             makedirs(self._offline_dir)
-            self._init_dir(args["local"]["off_content"])
+            self._init_dir(self._off_content)
         # step & epoch
         self._step = -1
         self._epoch = -1
@@ -76,6 +87,11 @@ class Visualization:
         :param smoke: instance of Smoke.
         :return: None
         """
+        # make dir
+        if self._enable_vis_offline:
+            makedirs(self._offline_dir)
+            self._init_dir(self._off_content)
+
         # Vis only once
         if self._once:
             self._vis_scenario(scenario, prefix, suffix)
@@ -213,6 +229,11 @@ class Visualization:
 
     def eval_norm(self, object_loader: ObjectLoader, stickers: TextureSticker):
         """Evaluate the norm of perturbation"""
+        metrics = self._eval_norm(object_loader, stickers)
+        self._logger_comet.log_metrics(metrics, epoch=self._epoch)
+
+    @staticmethod
+    def _eval_norm(object_loader: ObjectLoader, stickers: TextureSticker):
         metrics = {}
         # 0~1.0 RGB HWC float32
         texture_raw = object_loader.textures.clone().squeeze().cpu()
@@ -224,36 +245,17 @@ class Visualization:
             d_texture = (texture_perturb - texture_raw).permute(2, 0, 1)
 
             # L1 norm
-            # l1_norm = torch.norm(d_texture, p=1, dim=[1, 2])
-            # r_l1_norm, g_l1_norm, b_l1_norm = \
-            #     torch.split(l1_norm, split_size_or_sections=1, dim=0)
             rgb_l1_norm = torch.mean(torch.norm(d_texture, p=1, dim=0))
-            # metrics["r_l1_norm"] = r_l1_norm
-            # metrics["g_l1_norm"] = g_l1_norm
-            # metrics["b_l1_norm"] = b_l1_norm
             metrics["rgb_l1_norm"] = rgb_l1_norm
 
             # frobenius norm
-            # frobenius_norm = torch.norm(d_texture, p='fro', dim=[1, 2])
-            # r_frobenius_norm, g_frobenius_norm, b_frobenius_norm = \
-            #     torch.split(frobenius_norm, split_size_or_sections=1, dim=0)
             rgb_frobenius_norm = torch.mean(torch.norm(d_texture, p='fro', dim=0))
-            # metrics["r_frobenius_norm"] = r_frobenius_norm
-            # metrics["g_frobenius_norm"] = g_frobenius_norm
-            # metrics["b_frobenius_norm"] = b_frobenius_norm
             metrics["rgb_frobenius_norm"] = rgb_frobenius_norm
 
             # inf norm
-            # inf_norm = torch.norm(d_texture, p=float('inf'), dim=[1, 2])
-            # r_inf_norm, g_inf_norm, b_inf_norm = \
-            #     torch.split(inf_norm, split_size_or_sections=1, dim=0)
             rgb_inf_norm = torch.mean(torch.norm(d_texture, p=float('inf'), dim=0))
-            # metrics["r_inf_norm"] = r_inf_norm
-            # metrics["g_inf_norm"] = g_inf_norm
-            # metrics["b_inf_norm"] = b_inf_norm
             metrics["rgb_inf_norm"] = rgb_inf_norm
-
-            self._logger_comet.log_metrics(metrics, epoch=self._epoch)
+        return metrics
 
     def save_texture(self, loss_epoch, stickers: TextureSticker):
         """Save Patch At a certain frequency"""

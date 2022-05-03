@@ -41,12 +41,19 @@ class TextureSticker:
             adv_texture = state.get("adv_texture")
             self._adv_texture_hls = adv_texture.to(self._device)
 
-    def apply_gauss_perturb(self, clip_min=0.01, clip_max=0.1):
+    def apply_gauss_perturb(self, clip_min=-0.1, clip_max=0.1):
         """Apply normal perturb to ori texture."""
         ori_texture_hls = self._ori_texture_hls.clone()
-        random = torch.rand(ori_texture_hls.shape, device=ori_texture_hls.device)
-        random: torch.Tensor = torch.add(torch.mul(random, clip_max - clip_min), clip_min)
-        random = torch.clamp(random, min=clip_min, max=clip_max)
+        # X = z * sigma + mu
+        random_negative = torch.add(torch.mul(torch.randn(ori_texture_hls.shape, device=ori_texture_hls.device),
+                                              abs(clip_min) / 3), clip_min)
+        random_negative = torch.clamp(random_negative, min=-1.0, max=1.0)
+        random_positive = torch.add(torch.mul(torch.randn(ori_texture_hls.shape, device=ori_texture_hls.device),
+                                              abs(clip_max) / 3), clip_max)
+        random_positive = torch.clamp(random_positive, min=-1.0, max=1.0)
+        random_positive_mask = torch.ge(torch.randn(ori_texture_hls.shape, device=ori_texture_hls.device), 0)
+        random_negative_mask = torch.lt(torch.randn(ori_texture_hls.shape, device=ori_texture_hls.device), 0)
+        random = random_positive_mask * random_positive + random_negative_mask * random_negative
         adv_texture_hls = ori_texture_hls + self._mask * random
         self._adv_texture_hls = adv_texture_hls
 
@@ -86,7 +93,7 @@ class TextureSticker:
         l: torch.Tensor = torch.select(texture_hls_patch, -3, 1)
         s: torch.Tensor = torch.select(texture_hls_patch, -3, 2)
         eps = 1e-10
-        l_ = torch.clamp(l, min=eps, max=1-eps)
+        l_ = torch.clamp(l, min=eps, max=1 - eps)
         texture_hls_patch = torch.stack([h, l_, s], dim=-3).unsqueeze(0)
 
         # HLS -> RGB

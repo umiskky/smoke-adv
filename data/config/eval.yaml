@@ -2,7 +2,6 @@ base: "data/config/base.yaml"
 
 global:
   project_path: "/home/dingxl/nfs/workspace/smoke-adv/"
-  device: "cuda:0"
 
 dataset:
   meta: "data/config/meta_eval.yaml"
@@ -14,6 +13,11 @@ stickers:
   mask:
     half_sleeve: "data/objects/man_512/mask_half_sleeve.jpg"
     jeans: "data/objects/man_512/mask_jeans.jpg"
+
+attack:
+  optimizer:
+    clip_min: -0.1
+    clip_max: 0.1
 
 enable:
   object: true
@@ -34,6 +38,12 @@ renderer:
     sigma: 1e-6
     gamma: 1e-6
 
+eval:
+  texture_hls_path: "data/results/train/00299_061.69341_adv_texture_hls.pth"
+  raw_eval_path: "data/results/eval/raw"
+  attack_eval_path: "data/results/eval/attack"
+  gn_eval_path: "data/results/eval/gn"
+
 logger:
   common:
       confidence_threshold: 0.25
@@ -42,7 +52,7 @@ logger:
 #    plt_content: ["scenario", "render_bg", "render_scenario", "detection_2d", "detection_3d"]
     plt_content: ["detection_3d"]
     vis_offline: true
-    off_dir: "data/results2/eval/random/"
+    off_dir: "data/results/eval/attack"
     off_content: ["scenario", "render_scenario", "detection_2d", "detection_3d"]
 
 
