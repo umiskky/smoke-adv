@@ -74,10 +74,10 @@ defense:
     g_bits: 8
     b_bits: 8
   median_blur:
-    blur_limit: 3
+    kernel_size: 3
   gaussian_blur:
-    blur_limit: 3
-    sigma_limit: 0.5
+    kernel_size: 3
+    sigma: 0
   jpeg_compression:
     quality_lower: 0.0
     quality_upper: 100.0
@@ -105,10 +105,11 @@ attack:
     clip_max: 0.001
 
 eval:
+  gn_enable: false
   texture_hls_path: "data/results/train"
-  raw_eval_path: "data/results/eval/raw"
-  attack_eval_path: "data/results/eval/attack"
-  gn_eval_path: "data/results/eval/gn"
+  raw_eval_path: "data/results/eval/attack/raw"
+  attack_eval_path: "data/results/eval/attack/perturb"
+  gn_eval_path: "data/results/eval/attack/gn"
 
 logger:
    # ============= Common Vis Settings =============

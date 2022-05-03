@@ -3,6 +3,7 @@ import os.path as osp
 
 import torch
 
+from defense.transform import Transform
 from render.object_loader import ObjectLoader
 from render.renderer import Renderer
 from render.scenario import Scenario
@@ -74,8 +75,8 @@ class Visualization:
         if global_step > self._step:
             self._step = global_step
 
-    def vis(self, scenario_index, scenario: Scenario, renderer: Renderer, stickers: TextureSticker,
-            smoke: Smoke, prefix="", suffix=""):
+    def vis(self, scenario_index, scenario: Scenario, renderer: Renderer,
+            stickers: TextureSticker, defense: Transform, smoke: Smoke, prefix="", suffix=""):
         """
         Vis For Pipeline.\n
         :param prefix: name.
@@ -84,6 +85,7 @@ class Visualization:
         :param scenario: instance of Scenario.
         :param renderer: instance of Renderer.
         :param stickers: instance of TextureSticker.
+        :param defense: instance of Transform.
         :param smoke: instance of Smoke.
         :return: None
         """
@@ -103,6 +105,7 @@ class Visualization:
         # Vis every step
         self._vis_render_bg(renderer, scenario_index, prefix, suffix)
         self._vis_render_scenario(renderer, scenario_index, prefix, suffix)
+        self._vis_purifier_image(defense, scenario_index, prefix, suffix)
         self._vis_detection(smoke, scenario_index, prefix, suffix)
 
     def _vis_scenario(self, scenario: Scenario, prefix, suffix):
@@ -179,6 +182,26 @@ class Visualization:
                 log_img(logger=self._logger_comet,
                         image=render_scenario_plot,
                         img_name=scenario_index + "_" + epoch_step + "_render_scenario",
+                        step=self._epoch)
+
+    def _vis_purifier_image(self, defense: Transform, scenario_index, prefix, suffix):
+        if defense is not None and len(defense.visualization) > 0:
+            # 0~1.0 RGB HWC float64
+            purifier_image = defense.visualization.get("purifier_image")
+            if purifier_image is None:
+                return None
+            epoch_step = "%04d-epoch_%04d-step" % (self._epoch, self._step)
+            if self._enable_vis_plt and "purifier_image" in self._plt_content:
+                plot_img(purifier_image, "purifier_image_" + epoch_step)
+            if self._enable_vis_offline and "purifier_image" in self._off_content:
+                saving_path = osp.join(self._offline_dir, "purifier_image",
+                                       prefix + scenario_index + "_" + epoch_step + "_purifier_image"
+                                       + suffix + ".png")
+                save_img(purifier_image, saving_path)
+            if self._enable_comet and "purifier_image" in self._comet_content:
+                log_img(logger=self._logger_comet,
+                        image=purifier_image,
+                        img_name=scenario_index + "_" + epoch_step + "_purifier_image",
                         step=self._epoch)
 
     def _vis_detection(self, smoke: Smoke, scenario_index, prefix, suffix):

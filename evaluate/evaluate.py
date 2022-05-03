@@ -80,6 +80,7 @@ def evaluate(pipeline: Pipeline, dataset: dict, cfg: Config, off_dir: str, prefi
                                        scenario=pipeline.scenario,
                                        renderer=pipeline.renderer,
                                        stickers=pipeline.stickers,
+                                       defense=pipeline.defense,
                                        smoke=pipeline.smoke,
                                        prefix=prefix,
                                        suffix="_angle-%s" % str(angle))
@@ -185,7 +186,6 @@ def eval_attack_success_rate(metrics_dict: dict, fp: str, raw_metrics_dict=None)
         for angle in metrics_dict.keys():
             raw_metrics = raw_metrics_dict.get(angle)
             metrics = metrics_dict.get(angle)
-
             index.append(angle)
             d = 0
             # s1=[s, c, n]->[l]  s2=[c, n]->[l, s]  s3=[n]->[l, s, c]
@@ -261,8 +261,28 @@ def main_pipe(args):
     meta_name = (meta.split("/")[-1]).split(".")[0]
     mode = "train" if meta_name == "meta_train" else "eval"
 
+    # =========================== Solve Defense Saving Path ==========================
+    sub_dir = ""
+    if cfg.cfg_enable["defense"]:
+        purifier_type = cfg.cfg_defense["type"]
+        if "GaussianBlur" == purifier_type:
+            gb_params = cfg.cfg_defense["gaussian_blur"]
+            sub_dir = "gaussian_blur/kernel_{}___sigma_{}".format(gb_params["kernel_size"], gb_params["sigma"])
+        elif "MedianBlur" == purifier_type:
+            mb_params = cfg.cfg_defense["median_blur"]
+            sub_dir = "median_blur/kernel_{}".format(mb_params["kernel_size"])
+        elif "BitDepth" == purifier_type:
+            bd_params = cfg.cfg_defense["bit_depth"]
+            sub_dir = "bit_depth/r_{}___g_{}___b_{}".format(bd_params["r_bits"],
+                                                            bd_params["g_bits"],
+                                                            bd_params["b_bits"])
+        elif "JpegCompression" == purifier_type:
+            jc_params = cfg.cfg_defense["jpeg_compression"]
+            sub_dir = "jpeg_compression/lower_{}___upper_{}".format(jc_params["quality_lower"],
+                                                                    jc_params["quality_upper"])
+
     # =================================== Raw Eval ===================================
-    raw_fd = osp.join(global_path, cfg.cfg_eval["raw_eval_path"])
+    raw_fd = osp.join(global_path, cfg.cfg_eval["raw_eval_path"], sub_dir)
     makedirs(raw_fd)
     raw_fp = osp.join(raw_fd, "raw_%s_eval.pickle" % mode)
     if osp.exists(raw_fp):
@@ -277,7 +297,7 @@ def main_pipe(args):
     eval_attack_success_rate(raw_eval_metrics_dict, osp.join(raw_fd, "%s_eval.csv" % mode))
 
     # ================================= Attack Eval ==================================
-    attack_fd = osp.join(global_path, cfg.cfg_eval["attack_eval_path"], mode + "_" + timestamp)
+    attack_fd = osp.join(global_path, cfg.cfg_eval["attack_eval_path"], sub_dir, mode + "_" + timestamp)
     makedirs(attack_fd)
     attack_fp = osp.join(attack_fd, "attack_%s_eval.pickle" % mode)
     texture_hls_fp = osp.join(global_path, cfg.cfg_eval["texture_hls_path"])
@@ -299,18 +319,19 @@ def main_pipe(args):
     eval_attack_success_rate(attack_eval_metrics_dict, osp.join(attack_fd, "%s_eval.csv" % mode), raw_eval_metrics_dict)
 
     # =================================== GN Eval ====================================
-    gn_fd = osp.join(global_path, cfg.cfg_eval["gn_eval_path"], mode + "_" + timestamp)
-    makedirs(gn_fd)
-    gn_fp = osp.join(gn_fd, "gn_%s_eval.pickle" % mode)
-    # Generate gn perturb
-    pipeline.stickers.apply_gauss_perturb(cfg.cfg_attack["optimizer"]["clip_min"]*3,
-                                          cfg.cfg_attack["optimizer"]["clip_max"]*3)
-    gn_eval_metrics_dict = evaluate(pipeline=pipeline, dataset=copy.deepcopy(dataset),
-                                    cfg=cfg, off_dir=osp.join(gn_fd, "visualization"),
-                                    prefix="")
-    saving_metrics(gn_eval_metrics_dict, gn_fp)
-    eval_norm(pipeline, osp.join(gn_fd, "%s_norm.csv" % mode))
-    eval_attack_success_rate(gn_eval_metrics_dict, osp.join(gn_fd, "%s_eval.csv" % mode), raw_eval_metrics_dict)
+    if cfg.cfg_eval["gn_enable"]:
+        gn_fd = osp.join(global_path, cfg.cfg_eval["gn_eval_path"], sub_dir, mode + "_" + timestamp)
+        makedirs(gn_fd)
+        gn_fp = osp.join(gn_fd, "gn_%s_eval.pickle" % mode)
+        # Generate gn perturb
+        pipeline.stickers.apply_gauss_perturb(cfg.cfg_attack["optimizer"]["clip_min"] * 3,
+                                              cfg.cfg_attack["optimizer"]["clip_max"] * 3)
+        gn_eval_metrics_dict = evaluate(pipeline=pipeline, dataset=copy.deepcopy(dataset),
+                                        cfg=cfg, off_dir=osp.join(gn_fd, "visualization"),
+                                        prefix="")
+        saving_metrics(gn_eval_metrics_dict, gn_fp)
+        eval_norm(pipeline, osp.join(gn_fd, "%s_norm.csv" % mode))
+        eval_attack_success_rate(gn_eval_metrics_dict, osp.join(gn_fd, "%s_eval.csv" % mode), raw_eval_metrics_dict)
 
 
 def parse_args():
@@ -321,7 +342,7 @@ def parse_args():
         "--config",
         "-f",
         dest="cfg",
-        default="../data/config/eval.yaml",
+        default="../data/config/defense.yaml",
         help="The config file path.",
         required=False,
         type=str)

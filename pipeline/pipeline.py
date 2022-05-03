@@ -1,3 +1,4 @@
+from defense.transform import Transform
 from pipeline.modules.dataset import Dataset
 from pipeline.modules.loss import Loss
 from pipeline.modules.sample import Sample
@@ -52,7 +53,7 @@ class Pipeline:
 
         # =================== load defense ====================
         if self._enable["defense"]:
-            self.defense = None
+            self.defense = Transform(args.cfg_defense)
         else:
             self.defense = None
         # =====================================================
@@ -93,14 +94,23 @@ class Pipeline:
             if self.stickers is not None:
                 mesh = self.stickers.forward(mesh, enable_patch_grad=self._enable["attack"])
             if self.renderer is not None:
+                # synthesis_img [0.0, 255.0]
                 synthesis_img, box_pseudo_gt_ = self.renderer.forward(mesh, scenario, sample)
                 box_pseudo_gt = update_dic(box_pseudo_gt_, box_pseudo_gt)
         # Smoke Pipeline
         if self.smoke is not None:
+            purifier_img = None
             if self.renderer is not None:
-                box3d_branch, _ = self.smoke.forward(synthesis_img, sample)
+                if self.defense is not None:
+                    purifier_img = self.defense.forward(synthesis_img)
+                else:
+                    purifier_img = synthesis_img
             elif scenario is not None:
-                box3d_branch, _ = self.smoke.forward(scenario, sample)
+                if self.defense is not None:
+                    purifier_img = self.defense.forward(scenario)
+                else:
+                    purifier_img = scenario
+            box3d_branch, _ = self.smoke.forward(purifier_img, sample)
             if self.loss is not None:
                 loss = self.loss.forward(box_pseudo_gt=box_pseudo_gt,
                                          box3d_branch=box3d_branch,

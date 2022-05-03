@@ -55,8 +55,8 @@ class Renderer:
             # save some pseudo gt information
             self._box_pseudo_gt["2d"] = self._eval_2d_pseudo_gt(mask)
             self._box_pseudo_gt["3d"]["location"] = sample.location
-            # 0~255.0
-            synthesis_img = synthesis_normalized_img * 255.0
+            # 0~1.0 float32 HWC
+            synthesis_img = synthesis_normalized_img
         # ===========================================================================
 
         # ============================== Visualization ==============================

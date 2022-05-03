@@ -46,10 +46,10 @@ logger:
       confidence_threshold: 0.25
   comet:
     enable: true
-    test: false
+    test: true
     vis_content: []
   local:
-    vis_offline: true
+    vis_offline: false
 #    off_content: ["adv_texture", "detection_2d", "detection_3d"]
     off_content: ["adv_texture", "texture"]
     patch_save_frequency: 1

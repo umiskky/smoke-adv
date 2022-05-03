@@ -42,6 +42,11 @@
           <mappings>
             <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" />
           </mappings>
+          <excludedPaths>
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/eval" />
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/train" />
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/test" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

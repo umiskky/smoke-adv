@@ -65,9 +65,18 @@ class Smoke:
         """scenario must be 0~255.0 float32"""
         scenario_input = None
         if isinstance(scenario, np.ndarray):
-            scenario_input = torch.tensor(scenario, device=self._device).float()
+            if scenario.dtype == np.uint8:
+                scenario_input = torch.tensor(scenario, device=self._device).float()
+            else:
+                # float 32 / float 64   0~1.0 -> 0~255.0
+                scenario_input = torch.tensor((scenario * 255.0).astype(np.float32), device=self._device)
         elif isinstance(scenario, torch.Tensor):
-            scenario_input = scenario
+            if scenario.dtype == torch.uint8:
+                scenario_input = scenario.float()
+            else:
+                # float 32 / float 64   0~1.0 -> 0~255.0
+                scenario_input = torch.mul(scenario, 255.0)
+                scenario_input = scenario_input.float()
         assert scenario_input is not None
         scenario_size = scenario_input.shape[0:2]
         # CHW
