@@ -79,8 +79,7 @@ defense:
     kernel_size: 3
     sigma: 0
   jpeg_compression:
-    quality_lower: 0.0
-    quality_upper: 100.0
+    quality: 100
 
 smoke:
   model_path: "data/model/smoke_libtorch_model.pth"
@@ -110,6 +109,8 @@ eval:
   raw_eval_path: "data/results/eval/attack/raw"
   attack_eval_path: "data/results/eval/attack/perturb"
   gn_eval_path: "data/results/eval/attack/gn"
+  # using for comparison between raw and purifier in defense eval.
+  dataset_raw_path: "data/results/eval/attack/raw"
 
 logger:
    # ============= Common Vis Settings =============

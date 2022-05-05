@@ -296,6 +296,22 @@ def main_pipe(args):
         saving_metrics(raw_eval_metrics_dict, raw_fp)
     eval_attack_success_rate(raw_eval_metrics_dict, osp.join(raw_fd, "%s_eval.csv" % mode))
 
+    # =============================== Dataset Raw Eval ===============================
+    if cfg.cfg_enable["defense"]:
+        raw_fd = osp.join(global_path, cfg.cfg_eval["dataset_raw_path"])
+        makedirs(raw_fd)
+        raw_fp = osp.join(raw_fd, "raw_%s_eval.pickle" % mode)
+        if osp.exists(raw_fp):
+            raw_eval_metrics_dict = reading_metrics(raw_fp)
+            print("Raw %s dataset evaluation already exists." % mode)
+        else:
+            print("Evaluate raw %s dataset ..." % mode)
+            raw_eval_metrics_dict = evaluate(pipeline=pipeline, dataset=copy.deepcopy(dataset),
+                                             cfg=cfg, off_dir=osp.join(raw_fd, mode, "visualization"),
+                                             prefix="")
+            saving_metrics(raw_eval_metrics_dict, raw_fp)
+        eval_attack_success_rate(raw_eval_metrics_dict, osp.join(raw_fd, "%s_eval.csv" % mode))
+
     # ================================= Attack Eval ==================================
     attack_fd = osp.join(global_path, cfg.cfg_eval["attack_eval_path"], sub_dir, mode + "_" + timestamp)
     makedirs(attack_fd)

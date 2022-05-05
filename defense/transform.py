@@ -5,6 +5,7 @@ import numpy as np
 import torch
 
 from defense.gaussian_blur import GaussianBlur
+from defense.image_compression import JpegCompression
 from defense.median_blur import MedianBlur
 
 
@@ -37,12 +38,9 @@ class Transform:
                 GaussianBlur(kernel_size=kernel_size, sigma=sigma, always_apply=True)
             ])
         elif "JpegCompression" == self._type:
-            quality_lower = args["jpeg_compression"]["quality_lower"]
-            quality_upper = args["jpeg_compression"]["quality_upper"]
             self._transform = A.Compose([
                 A.FromFloat(dtype="uint8", always_apply=True),
-                A.ImageCompression(quality_lower=quality_lower, quality_upper=quality_upper,
-                                   compression_type=0, always_apply=True),
+                JpegCompression(quality=args["jpeg_compression"]["quality"],  always_apply=True),
                 A.ToFloat(always_apply=True)
             ])
         self.visualization = {}

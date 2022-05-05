@@ -18,12 +18,16 @@ if __name__ == '__main__':
 
     plot_img(image.numpy(), title="")
     args = dict(type="JpegCompression",
-                bit_depth=dict(r_bits=8, g_bits=8, b_bits=8),
-                median_blur=dict(kernel_size=11),
-                gaussian_blur=dict(kernel_size=3, sigma=0),
-                jpeg_compression=dict(quality_lower=0.0, quality_upper=10.0))
+                bit_depth=dict(r_bits=1, g_bits=1, b_bits=1),
+                median_blur=dict(kernel_size=21),
+                gaussian_blur=dict(kernel_size=29, sigma=0),
+                jpeg_compression=dict(quality=10))
 
     defense = Transform(args)
     purifier_img = defense.forward(image)
     plot_img(defense.visualization["purifier_image"], title="")
     pass
+# GB [5, 11, 17, 23, 29]
+# MB [5, -> 9, 13, 17, 21]
+# BD [5, 4, 3, 2, 1]
+# JC [90, 70, 50, 30, 10]

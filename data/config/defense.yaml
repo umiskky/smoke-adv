@@ -21,19 +21,18 @@ attack:
 
 defense:
   # Support Types: ["BitDepth", "MedianBlur", "GaussianBlur", "JpegCompression"]
-  type: "GaussianBlur"
+  type: "BitDepth"
   bit_depth:
-    r_bits: 8
-    g_bits: 8
-    b_bits: 8
+    r_bits: 5
+    g_bits: 5
+    b_bits: 5
   median_blur:
-    kernel_size: 3
+    kernel_size: 21
   gaussian_blur:
-    kernel_size: 3
+    kernel_size: 29
     sigma: 0
   jpeg_compression:
-    quality_lower: 0.0
-    quality_upper: 100.0
+    quality: 100
 
 enable:
   object: true
@@ -46,10 +45,11 @@ enable:
 
 eval:
   gn_enable: false
-  texture_hls_path: "data/results/train/2022-04-29-14-40/visualization/adv_texture/00335_002.26780_adv_texture_hls.pth"
+  texture_hls_path: "data/results/train/2022-04-29-14-40/visualization/adv_texture/00398_002.31178_adv_texture_hls.pth"
   raw_eval_path: "data/results/eval/defense/raw"
   attack_eval_path: "data/results/eval/defense/perturb"
   gn_eval_path: "data/results/eval/defense/gn"
+  dataset_raw_path: "data/results/eval/attack/raw"
 
 logger:
   common:

@@ -48,21 +48,20 @@ class Smoke:
                 vis_box3d_branch = box3d_branch.clone().cpu()
             if isinstance(scenario, torch.Tensor):
                 if scenario.requires_grad:
-                    vis_scenario = scenario.detach().clone().cpu().numpy().astype(np.uint8)
+                    vis_scenario = scenario.detach().clone().cpu().numpy()
                 else:
-                    vis_scenario = scenario.clone().cpu().numpy().astype(np.uint8)
+                    vis_scenario = scenario.clone().cpu().numpy()
             else:
                 vis_scenario = scenario
             self.visualization["detection"] = vis_box3d_branch
             self.visualization["K"] = self.getIntrinsicMatrix(K=sample.K, device="cpu")
             self.visualization["scenario_size"] = scenario_size
-            # np.ndarray HWC int8
+            # np.ndarray HWC
             self.visualization["scenario"] = vis_scenario
         # =============================================================================================
         return box3d_branch, feat_branch
 
     def smoke_transform(self, scenario) -> (torch.Tensor, list):
-        """scenario must be 0~255.0 float32"""
         scenario_input = None
         if isinstance(scenario, np.ndarray):
             if scenario.dtype == np.uint8:

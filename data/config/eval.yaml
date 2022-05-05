@@ -29,10 +29,11 @@ enable:
 
 eval:
   gn_enable: true
-  texture_hls_path: "data/results/train/00299_061.69341_adv_texture_hls.pth"
+  texture_hls_path: "data/results/train/2022-04-29-14-40/visualization/adv_texture/00398_002.31178_adv_texture_hls.pth"
   raw_eval_path: "data/results/eval/attack/raw"
   attack_eval_path: "data/results/eval/attack/perturb"
   gn_eval_path: "data/results/eval/attack/gn"
+
 
 logger:
   common:
