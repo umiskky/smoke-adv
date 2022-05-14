@@ -21,18 +21,18 @@ attack:
 
 defense:
   # Support Types: ["BitDepth", "MedianBlur", "GaussianBlur", "JpegCompression"]
-  type: "BitDepth"
+  type: "MedianBlur"
   bit_depth:
-    r_bits: 5
-    g_bits: 5
-    b_bits: 5
+    r_bits: 1
+    g_bits: 1
+    b_bits: 1
   median_blur:
-    kernel_size: 21
+    kernel_size: 33
   gaussian_blur:
-    kernel_size: 29
+    kernel_size: 47
     sigma: 0
   jpeg_compression:
-    quality: 100
+    quality: 10
 
 enable:
   object: true

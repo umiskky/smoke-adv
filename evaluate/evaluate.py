@@ -278,8 +278,7 @@ def main_pipe(args):
                                                             bd_params["b_bits"])
         elif "JpegCompression" == purifier_type:
             jc_params = cfg.cfg_defense["jpeg_compression"]
-            sub_dir = "jpeg_compression/lower_{}___upper_{}".format(jc_params["quality_lower"],
-                                                                    jc_params["quality_upper"])
+            sub_dir = "jpeg_compression/quality_{}".format(jc_params["quality"])
 
     # =================================== Raw Eval ===================================
     raw_fd = osp.join(global_path, cfg.cfg_eval["raw_eval_path"], sub_dir)

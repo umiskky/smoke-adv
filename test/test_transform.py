@@ -27,7 +27,7 @@ if __name__ == '__main__':
     purifier_img = defense.forward(image)
     plot_img(defense.visualization["purifier_image"], title="")
     pass
-# GB [5, 11, 17, 23, 29]
-# MB [5, -> 9, 13, 17, 21]
+# GB [5, 11, 17, 23, 29, 35, 41, 47]
+# MB [5, 9, 13, 17, 21, 25, 29, 33]
 # BD [5, 4, 3, 2, 1]
 # JC [90, 70, 50, 30, 10]

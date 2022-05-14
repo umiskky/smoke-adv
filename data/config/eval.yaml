@@ -4,7 +4,7 @@ global:
   project_path: "/home/dingxl/nfs/workspace/smoke-adv/"
 
 dataset:
-  meta: "data/config/meta_eval.yaml"
+  meta: "data/config/meta_train.yaml"
 
 object:
   obj_path: "data/objects/man_512/man.obj"
@@ -20,7 +20,7 @@ attack:
     clip_max: 0.1
 
 enable:
-  object: true
+  object: true0
   stickers: true
   scenario: true
   renderer: true

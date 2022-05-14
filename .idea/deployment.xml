@@ -20,6 +20,17 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="dingxl@101.6.68.75:10100 agent (1)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/dingxl/workspace/smoke-adv" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/home/dingxl/workspace/smoke-adv/data/datasets" />
+            <excludedPath path="/home/dingxl/workspace/smoke-adv/data/results" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
       <paths name="dingxl@101.6.70.53:20900 key">
         <serverdata>
           <mappings>
@@ -40,12 +51,20 @@
       <paths name="dingxl@eoe2:22 agent">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
-            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/eval" />
-            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/train" />
-            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results/test" />
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+      <paths name="dingxl@eoe2:22 agent (1)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/dingxl/nfs/workspace/smoke-adv" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/home/dingxl/nfs/workspace/smoke-adv/data/results" />
           </excludedPaths>
         </serverdata>
       </paths>
